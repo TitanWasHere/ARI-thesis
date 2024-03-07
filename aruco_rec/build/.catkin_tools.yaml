@@ -1,0 +1,6 @@
+devel_space: /home/user/exchange/aruco_rec/devel
+install: false
+install_space: /home/user/exchange/aruco_rec/install
+profile: default
+source_space: /home/user/exchange/aruco_rec/src
+workspace: /home/user/exchange/aruco_rec

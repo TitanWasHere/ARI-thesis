@@ -1,0 +1,12 @@
+Symlinking /home/user/exchange/aruco_rec/devel/./local_setup.sh
+Symlinking /home/user/exchange/aruco_rec/devel/./cmake.lock
+Symlinking /home/user/exchange/aruco_rec/devel/./_setup_util.py
+Symlinking /home/user/exchange/aruco_rec/devel/./env.sh
+Symlinking /home/user/exchange/aruco_rec/devel/./setup.sh
+Symlinking /home/user/exchange/aruco_rec/devel/./setup.bash
+Symlinking /home/user/exchange/aruco_rec/devel/./local_setup.zsh
+Symlinking /home/user/exchange/aruco_rec/devel/./setup.zsh
+Symlinking /home/user/exchange/aruco_rec/devel/./local_setup.bash
+Symlinking /home/user/exchange/aruco_rec/devel/share/catkin_tools_prebuild/cmake/catkin_tools_prebuildConfig-version.cmake
+Symlinking /home/user/exchange/aruco_rec/devel/share/catkin_tools_prebuild/cmake/catkin_tools_prebuildConfig.cmake
+Symlinking /home/user/exchange/aruco_rec/devel/lib/pkgconfig/catkin_tools_prebuild.pc

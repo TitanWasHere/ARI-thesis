@@ -1,0 +1,1 @@
+/home/user/exchange/aruco_rec/devel/.private/std_msgs/share/std_msgs/cmake/std_msgsConfig-version.cmake

@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/user/exchange/aruco_ws/devel/.private/detection/setup.sh
