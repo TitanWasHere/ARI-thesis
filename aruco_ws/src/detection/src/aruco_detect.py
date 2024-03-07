@@ -36,19 +36,31 @@ cx_RealSense_1280 = 642.2582577578172
 cy_RealSense_1280 = 474.1471906434584
 fx_RealSense_1280 = 999.461170663331
 fy_RealSense_1280 = 996.9611451866272
-# k1_RealSense_1280 = 0.164427473610091
-# k2_RealSense_1280 = -0.2717244716038656
-# k3_RealSense_1280 = 0.0
-# p1_RealSense_1280 = -0.002867946281892625
-# p2_RealSense_1280 = -9.69782173585606e-05
-k1_RealSense_1280 = 0.0
-k2_RealSense_1280 = 0.0
+k1_RealSense_1280 = 0.164427473610091
+k2_RealSense_1280 = -0.2717244716038656
 k3_RealSense_1280 = 0.0
-p1_RealSense_1280 = 0.0
-p2_RealSense_1280 = 0.0
+p1_RealSense_1280 = -0.002867946281892625
+p2_RealSense_1280 = -9.69782173585606e-05
+# k1_RealSense_1280 = 0.0
+# k2_RealSense_1280 = 0.0
+# k3_RealSense_1280 = 0.0
+# p1_RealSense_1280 = 0.0
+# p2_RealSense_1280 = 0.0
 
 INTRINSIC_CAMERA_REALSENSE_1280 = np.array([[fx_RealSense_1280, 0, cx_RealSense_1280], [0, fy_RealSense_1280, cy_RealSense_1280], [0, 0, 1]])
 DISTORTION_CAMERA_REALSENSE_1280 = np.array([k1_RealSense_1280, k2_RealSense_1280, p1_RealSense_1280, p2_RealSense_1280, k3_RealSense_1280])
+
+rot_x = np.array([
+            [1, 0, 0], 
+            [0, 0, 1], 
+            [0, -1, 0]
+            ], dtype=np.float64) 
+
+rot_z = np.array([
+            [1, 0, 0], 
+            [0, 1, 0], 
+            [0, 0, 1]
+            ], dtype=np.float64)
 
 class detection:
     def __init__(self):
@@ -61,17 +73,26 @@ class detection:
         self.received_image = False
         #self.bridge = CvBridge()
 
+
+    def print_camera_position(self, tvec, rvec, ids):
+        #Print the camera position given the tvec and rvec of the aruco
+        if ids is None:
+            return
+        for i in range(len(ids)):
+            print('[Camera] position:' + str(self.get_camera_position_from_aruco_position(tvec[i], rvec[i])))
+
     def image_callback(self, msg):
         bridge = CvBridge()
         self.image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
 
         image = copy.deepcopy(self.image)
-        frame, tvec, rvec = self.get_pose(image, 1280)
+        frame, tvec, rvec, ids = self.get_pose(image, 1280)
         cv2.imshow('image_torso', frame)
         cv2.waitKey(1)
 
-        self.pub_torso.publish(bridge.cv2_to_imgmsg(frame, "bgr8"))
+        self.print_camera_position(tvec, rvec, ids)
 
+        self.pub_torso.publish(bridge.cv2_to_imgmsg(frame, "bgr8"))
         
 
     def image_compressed_callback(self, msg):
@@ -81,10 +102,12 @@ class detection:
 
         bridge = CvBridge()
         
-        frame, tvec, rvec = self.get_pose(image_wrp)
+        frame, tvec, rvec, ids = self.get_pose(image_wrp)
         
         cv2.imshow('image_front', image_wrp)
         cv2.waitKey(1)
+        #print('compressed')
+        self.print_camera_position(tvec, rvec, ids)
 
         self.pub_front.publish(bridge.cv2_to_imgmsg(frame, "bgr8"))
 
@@ -96,7 +119,7 @@ class detection:
         #cv2.waitKey(1)
         #corners, ids, rejectedImgPoints = aruco.detectMarkers(frame, aruco.Dictionary_get(aruco.DICT_4X4_50))
         corners, ids, rejectedImgPoints = aruco.detectMarkers(gray, aruco.Dictionary_get(aruco.DICT_4X4_50))
-
+        print('ids: ' + str(ids))
         if len(corners) > 0:
             ids = ids.flatten()
 
@@ -109,15 +132,34 @@ class detection:
 
             rvec, tvec = aruco.estimatePoseSingleMarkers(corners, 0.05, INTRINSIC_USED, DISTORTION_USED)
             frame = cv2.aruco.drawDetectedMarkers(frame, corners,ids)
-            print('[INFO] rvec: ', rvec)
-            print('[INFO] tvec: ', tvec)
             for i in range(len(ids)):
                 frame = cv2.aruco.drawAxis(frame, INTRINSIC_USED, DISTORTION_USED, rvec[i], tvec[i], 0.1)
+                print('[' + str(ids[i]) + '] tvec: ' + str(tvec[i][0]) + ' rvec: ' + str(rvec[i][0]))
+
             #frame = cv2.aruco.drawAxis(frame, INTRINSIC_CAMERA, DISTORTION_CAMERA, rvec, tvec, 0.1)
-            return frame, tvec, rvec
-        return frame, None, None
+            return frame, tvec, rvec, ids
+        return frame, None, None, None
+    
+    def get_aruco_position(self, tvec, rvec):
+        tvec = tvec.flatten()
+        rvec = rvec.flatten()
+        rot_mat = cv2.Rodrigues(rvec)[0] # Convert rotation of marker to rotation matrix using Rodrigues function
+        rot_mat = np.dot(rot_x, rot_mat) # Rotate the marker 90 degrees in x axis
+        rot_mat = np.dot(rot_z, rot_mat) # Rotate the marker 90 degrees in z axis
+        rot_mat = np.transpose(rot_mat) # Transpose the rotation matrix
+        pose = np.eye(4) # Create a 4x4 identity matrix
+        pose[0:3, 0:3] = rot_mat # Assign the rotation matrix to the top left 3x3 submatrix
+        pose[0:3, 3] = tvec # Assign the translation vector to the top right 3x1 submatrix
+        return pose
+    
+    def get_camera_position_from_aruco_position(self, tvec, rvec):
+        #Get the camera position given the tvec and rvec of the aruco
+        pose = self.get_aruco_position(tvec[0], rvec[0])
+        pose = np.linalg.inv(pose)
+        tvec = pose[0:3, 3]
+        return tvec
 
-
+    
 
 
 if __name__ == '__main__':
