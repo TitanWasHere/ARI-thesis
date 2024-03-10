@@ -31,7 +31,7 @@ p2_RealSense = 0.0
 INTRINSIC_CAMERA_REALSENSE = np.array([[fx_RealSense, 0, cx_RealSense], [0, fy_RealSense, cy_RealSense], [0, 0, 1]])
 DISTORTION_CAMERA_REALSENSE = np.array([k1_RealSense, k2_RealSense, p1_RealSense, p2_RealSense, k3_RealSense])
 
-# Camera calibration values (RealSense D435) - 1280x960
+# Camera calibration values (Sony 8MegaPixel) - 1280x960
 cx_RealSense_1280 = 642.2582577578172
 cy_RealSense_1280 = 474.1471906434584
 fx_RealSense_1280 = 999.461170663331
