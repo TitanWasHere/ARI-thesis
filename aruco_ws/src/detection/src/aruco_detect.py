@@ -92,7 +92,7 @@ class detection:
         cv2.imshow('image_torso', frame)
         cv2.waitKey(1)
 
-        self.manage_frame(frame, tvec, rvec, ids)
+        self.manage_frame(frame, tvec, rvec, ids, "torso" )
 
         
 
@@ -108,11 +108,11 @@ class detection:
         cv2.imshow('image_front', image_wrp)
         cv2.waitKey(1)
         
-        #self.manage_frame(frame, tvec, rvec, ids)
-        self.pub_torso.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
+        self.manage_frame(frame, tvec, rvec, ids, "head")
+        #self.pub_torso.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
 
 
-    def manage_frame(self, frame, tvec, rvec, ids):
+    def manage_frame(self, frame, tvec, rvec, ids, type):
         if ids is not None:
             self.print_camera_position(tvec, rvec, ids)
             # publish on /initialpose the position of the camera respect to the aruco in the map frame
@@ -132,8 +132,10 @@ class detection:
             # pose.pose.pose.orientation.w = 1
             # self.pub_myPos.publish(pose)
 
-
-        self.pub_torso.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
+        if type == "torso":
+            self.pub_torso.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
+        else:
+            self.pub_front.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
 
     def get_pose(self, frame, width=848):
         #cv2.imshow('image', frame)

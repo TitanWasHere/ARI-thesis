@@ -9,5 +9,7 @@ export PWD='/home/user/exchange/aruco_ws/build/detection'
 
 # modified environment variables
 export CMAKE_PREFIX_PATH="/home/user/exchange/aruco_ws/devel/.private/detection:$CMAKE_PREFIX_PATH"
+export LD_LIBRARY_PATH="/home/user/exchange/aruco_ws/devel/.private/detection/lib:$LD_LIBRARY_PATH"
+export PKG_CONFIG_PATH="/home/user/exchange/aruco_ws/devel/.private/detection/lib/pkgconfig:$PKG_CONFIG_PATH"
 export ROSLISP_PACKAGE_DIRECTORIES="/home/user/exchange/aruco_ws/devel/.private/detection/share/common-lisp:$ROSLISP_PACKAGE_DIRECTORIES"
 export ROS_PACKAGE_PATH="/home/user/exchange/aruco_ws/src/detection:$ROS_PACKAGE_PATH"
