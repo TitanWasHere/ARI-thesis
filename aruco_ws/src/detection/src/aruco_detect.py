@@ -10,6 +10,7 @@ from sensor_msgs.msg import Image
 from sensor_msgs.msg import CompressedImage
 from cv_bridge import CvBridge
 from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseWithCovarianceStamped
 from std_msgs.msg import Header
 import copy
 from time import sleep
@@ -67,11 +68,12 @@ class detection:
         rospy.init_node('detection')
         self.pub_torso = rospy.Publisher('/torso_front_camera/color/aruco', Image, queue_size=2)
         self.pub_front = rospy.Publisher('/head_front_camera/color/aruco', Image, queue_size=2)
+        self.pub_myPos = rospy.Publisher('/initialpose', PoseWithCovarianceStamped, queue_size=2)
         self.sub_torso = rospy.Subscriber('/torso_front_camera/color/image_raw', Image, self.image_callback, queue_size=2)
         self.sub_front = rospy.Subscriber('/head_front_camera/color/image_raw/compressed', CompressedImage, self.image_compressed_callback, queue_size=2)
         self.bridge = CvBridge()
         self.received_image = False
-        #self.bridge = CvBridge()
+        self.bridge = CvBridge()
 
 
     def print_camera_position(self, tvec, rvec, ids):
@@ -82,7 +84,7 @@ class detection:
             print('[Camera] position:' + str(self.get_camera_position_from_aruco_position(tvec[i], rvec[i])))
 
     def image_callback(self, msg):
-        bridge = CvBridge()
+        #bridge = CvBridge()
         self.image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
 
         image = copy.deepcopy(self.image)
@@ -90,9 +92,8 @@ class detection:
         cv2.imshow('image_torso', frame)
         cv2.waitKey(1)
 
-        self.print_camera_position(tvec, rvec, ids)
+        self.manage_frame(frame, tvec, rvec, ids)
 
-        self.pub_torso.publish(bridge.cv2_to_imgmsg(frame, "bgr8"))
         
 
     def image_compressed_callback(self, msg):
@@ -106,10 +107,33 @@ class detection:
         
         cv2.imshow('image_front', image_wrp)
         cv2.waitKey(1)
-        #print('compressed')
-        self.print_camera_position(tvec, rvec, ids)
+        
+        #self.manage_frame(frame, tvec, rvec, ids)
+        self.pub_torso.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
 
-        self.pub_front.publish(bridge.cv2_to_imgmsg(frame, "bgr8"))
+
+    def manage_frame(self, frame, tvec, rvec, ids):
+        if ids is not None:
+            self.print_camera_position(tvec, rvec, ids)
+            # publish on /initialpose the position of the camera respect to the aruco in the map frame
+            # pose = self.get_aruco_position(tvec[0], rvec[0])
+            # pose = np.linalg.inv(pose)
+            # tvec = pose[0:3, 3]
+            # pose = PoseWithCovarianceStamped()
+            # pose.header = Header()
+            # pose.header.stamp = rospy.Time.now()
+            # pose.header.frame_id = '/map'
+            # pose.pose.pose.position.x = tvec[0]
+            # pose.pose.pose.position.y = tvec[1]
+            # pose.pose.pose.position.z = tvec[2]
+            # pose.pose.pose.orientation.x = 0
+            # pose.pose.pose.orientation.y = 0
+            # pose.pose.pose.orientation.z = 0
+            # pose.pose.pose.orientation.w = 1
+            # self.pub_myPos.publish(pose)
+
+
+        self.pub_torso.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
 
     def get_pose(self, frame, width=848):
         #cv2.imshow('image', frame)
@@ -159,6 +183,9 @@ class detection:
         tvec = pose[0:3, 3]
         return tvec
 
+    def camera_pose_to_map_pose(self, camera_pose_in_aruco, aruco_pose_in_map):
+        # Transform the camera pose respect to the aruco to its position in the map frame
+        return np.dot(aruco_pose_in_map, camera_pose_in_aruco)
     
 
 
