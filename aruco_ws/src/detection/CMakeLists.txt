@@ -208,3 +208,4 @@ include_directories(
 # catkin_add_nosetests(test)
 
 #catkin_install_python(PROGRAMS detection camera_data ${CATKIN_PACKAGE_BIN_DESTINATION})
+catkin_install_python(PROGRAMS scripts/ArUco_data.py DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
