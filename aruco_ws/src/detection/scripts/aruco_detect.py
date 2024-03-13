@@ -82,38 +82,8 @@ class detection:
         self.manage_frame(frame, tvec, rvec, ids, "front")
         #self.pub_torso.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
 
-
-    def manage_frame(self, frame, tvec, rvec, ids, type):
-        if ids is not None:
-            self.print_camera_position(tvec, rvec, ids)
-            # publish on /initialpose the position of the camera respect to the aruco in the map frame
-            for i in range(len(ids)):
-                aruco_pose_in_map = ArUcos[i]
-                camera_pose_in_aruco = self.get_camera_position_from_aruco_position(tvec[i], rvec[i])
-
-                robot_position_in_map = self.camera_pose_to_map_pose(camera_pose_in_aruco, aruco_pose_in_map)
-
-                # Publish the position of the robot in the map frame
-                pose = PoseWithCovarianceStamped()
-                pose.header = Header()
-                pose.header.stamp = rospy.Time.now()
-                pose.pose.pose.position.x = robot_position_in_map[0]
-                pose.pose.pose.position.y = robot_position_in_map[1]
-                pose.pose.pose.position.z = robot_position_in_map[2]
-                # Orientation given by the orientation of the camera respect of the aruco with rvec and tvec
-                
-                
-
-                pose.pose.pose.orientation.w = 1
-                self.pub_myPos.publish(pose)
-
-
-        if type == "torso":
-            self.pub_torso.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
-        elif type == "front":
-            self.pub_front.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
-
     def get_pose(self, frame, width=848):
+        print('---------------------------------')
         #cv2.imshow('image', frame)
         #cv2.waitKey(1)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -121,7 +91,7 @@ class detection:
         #cv2.waitKey(1)
         #corners, ids, rejectedImgPoints = aruco.detectMarkers(frame, aruco.Dictionary_get(aruco.DICT_4X4_50))
         corners, ids, rejectedImgPoints = aruco.detectMarkers(gray, aruco.Dictionary_get(aruco.DICT_4X4_50))
-        print('ids: ' + str(ids))
+        print('ids: ' + str(ids[0][0]))
         if len(corners) > 0:
             ids = ids.flatten()
 
@@ -136,11 +106,48 @@ class detection:
             frame = cv2.aruco.drawDetectedMarkers(frame, corners,ids)
             for i in range(len(ids)):
                 frame = cv2.aruco.drawAxis(frame, INTRINSIC_USED, DISTORTION_USED, rvec[i], tvec[i], 0.1)
-                print('[' + str(ids[i]) + '] tvec: ' + str(tvec[i][0]) + ' rvec: ' + str(rvec[i][0]))
+                print('[' + str(ids[i]) + ']: { tvec: ' + str(tvec[i][0]) + ' rvec: ' + str(rvec[i][0]) + ' }')
 
             #frame = cv2.aruco.drawAxis(frame, INTRINSIC_CAMERA, DISTORTION_CAMERA, rvec, tvec, 0.1)
             return frame, tvec, rvec, ids
         return frame, None, None, None
+
+    def manage_frame(self, frame, tvec, rvec, ids, type):
+        if ids is not None:
+            #self.print_camera_position(tvec, rvec, ids)
+            # publish on /initialpose the position of the camera respect to the aruco in the map frame
+            for i in range(len(ids)):
+                
+                aruco_pose_in_map = ArUcos[str(ids[i])]
+                print('Aruco position in map: ' + str(aruco_pose_in_map))
+                camera_pose_in_aruco = self.get_camera_position_from_aruco_position(tvec[i], rvec[i])
+                print('Camera position in aruco: ' + str(camera_pose_in_aruco))
+                camera_position_in_map = self.camera_pose_to_map_pose(camera_pose_in_aruco, aruco_pose_in_map)
+                print('camera position in map: ' + str(camera_position_in_map))
+
+
+                # Publish the position of the robot in the map frame
+                initpose = PoseWithCovarianceStamped()
+                initpose.header = Header()
+                initpose.header.stamp = rospy.Time.now()
+                initpose.pose.pose.position.x = camera_position_in_map[0]
+                initpose.pose.pose.position.y = camera_position_in_map[1]
+                initpose.pose.pose.position.z = camera_position_in_map[2]
+
+                # Orientation given by the orientation of the camera respect of the aruco with rvec and tvec
+                initpose.pose.pose.orientation.x = 0
+                initpose.pose.pose.orientation.y = 0
+                initpose.pose.pose.orientation.z = 0
+                initpose.pose.pose.orientation.w = 1
+                self.pub_myPos.publish(initpose)
+
+
+        if type == "torso":
+            self.pub_torso.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
+        elif type == "front":
+            self.pub_front.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
+
+    
     
     def get_aruco_position(self, tvec, rvec):
         tvec = tvec.flatten()
@@ -158,12 +165,16 @@ class detection:
         #Get the camera position given the tvec and rvec of the aruco
         pose = self.get_aruco_position(tvec[0], rvec[0])
         pose = np.linalg.inv(pose)
-        tvec = pose[0:3, 3]
-        return tvec
+        return pose[0:3, 0:3]
 
     def camera_pose_to_map_pose(self, camera_pose_in_aruco, aruco_pose_in_map):
         # Transform the camera pose respect to the aruco to its position in the map frame
-        return np.dot(aruco_pose_in_map, camera_pose_in_aruco)
+        print('camera_pose_in_aruco: ' + str(camera_pose_in_aruco))
+        print('aruco_pose_in_map: ' + str(aruco_pose_in_map))
+
+        mul = np.dot(aruco_pose_in_map, camera_pose_in_aruco)
+        print('mul: ' + str(mul))
+        return mul
     
 
 
