@@ -15,6 +15,7 @@ from std_msgs.msg import Header
 from scipy.spatial.transform import Rotation
 import copy
 from time import sleep
+from pyquaternion import Quaternion
 
 from ArUco_data import *
 from camera_data import *
@@ -77,8 +78,8 @@ class detection:
         
         frame, tvec, rvec, ids = self.get_pose(image_wrp)
         
-        cv2.imshow('image_front', image_wrp)
-        cv2.waitKey(1)
+        #cv2.imshow('image_front', image_wrp)
+        #cv2.waitKey(1)
         
         self.manage_frame(frame, tvec, rvec, ids, "front")
         #self.pub_torso.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
@@ -115,49 +116,90 @@ class detection:
             return frame, tvec, rvec, ids
         return frame, None, None, None
 
+    def quaternion_multiplication(self, q0, q1):
+        # Multiplication of two quaternions
+        x0, y0, z0, w0 = q0
+        x1, y1, z1, w1 = q1
+        x = w0 * x1 + x0 * w1 + y0 * z1 - z0 * y1
+        y = w0 * y1 - x0 * z1 + y0 * w1 + z0 * x1
+        z = w0 * z1 + x0 * y1 - y0 * x1 + z0 * w1
+        w = w0 * w1 - x0 * x1 - y0 * y1 - z0 * z1
+        return np.array([x, y, z, w])
+
     def manage_frame(self, frame, tvec, rvec, ids, type):
         if ids is not None:
             #self.print_camera_position(tvec, rvec, ids)
             # publish on /initialpose the position of the camera respect to the aruco in the map frame
             for i in range(len(ids)):
+                try:
+                    aruco = ArUcos[str(ids[i])]
+                    rvec_aruco_from_cam = rvec[i][0]
+                    tvec_aruco_from_cam = tvec[i][0]
 
-                ArUco_in_map = ArUcos[str(ids[i])]["position"]
+                    # Rvec to matrix 3x3 with rodrigues
+                    rvec_matrix = cv2.Rodrigues(rvec_aruco_from_cam)[0]
 
-                # If they aren't, convert each orientation to a quaternion
-                # Calculate the qyaternion that represent the rotation of the aruco respect to the camera
-                # Calculate the inverse quaternion that rapresent the rotation of the camera respect to the aruco
-                # Multiply the quaternion of the aruco respect to the map by the inverse quaternion of the aruco respect to the camera to obtain the quaternion of the camera respect to the map
+                    # orient_zero = np.array([0, 0, 0, 1])
+                    # pose_zero = np.array([0, 0, 0])
+                    # orient_zero = (Quaternion(orient_zero)).rotation_matrix
+                    # zero_mat = np.zeros((4,4))
+                    # zero_mat[3,3] = 1
+                    # zero_mat[:3,:3] = orient_zero
+                    # zero_mat[:3,3] = pose_zero
 
+                    # create rotation matrix 4x4
+                    T_cam = np.zeros((4,4))
+                    T_cam[:3,:3] = rvec_matrix
+                    T_cam[3,3] = 1
+                    #print(T_cam[:3, 3])
+                    T_cam[:3,3] = tvec_aruco_from_cam
+                    
+                    # Inverse of rot_matrix
+                    T_cam = np.linalg.inv(T_cam)
+
+                    # Create the transformation matrix of the aruco
+                    T_aruco = np.zeros((4,4))
+                    # aruco["orientation"] is a quaternion
+                    quat_aruco = np.array(aruco["orientation"])
+                    quat_aruco = Quaternion(quat_aruco)
+                    T_aruco[:3,:3] = quat_aruco.rotation_matrix
+                    T_aruco[3,3] = 1
+                    T_aruco[:3,3] = np.array(aruco["position"])
+
+                    # Create the transformation matrix of the camera respect to the aruco
+                    #T_cam_aruco = np.dot(zero_mat, T_aruco)
+                    T_cam_aruco = np.dot(T_aruco, T_cam)
+
+                    # Extract the position and orientation of the camera respect to the aruco
+                    tvec_final = T_cam_aruco[:3,3]
+                    rvec_final = np.eye(3)
+                    rvec_final = T_cam_aruco[:3,:3]
+                    
+                    rvec_final = np.array(rvec_final)
+                    q_final = Quaternion(matrix=rvec_final)
+                    
+                    print('tvec_final: ' + str(tvec_final))
+
+                    # Publish the position of the camera respect to the aruco
+                    pose = PoseWithCovarianceStamped()
+                    pose.header = Header()
+                    pose.header.stamp = rospy.Time.now()
+                    pose.header.frame_id = "map"
+                    pose.pose.pose.position.x = tvec_final[0]
+                    pose.pose.pose.position.y = tvec_final[1]
+                    pose.pose.pose.position.z = tvec_final[2]
+                    pose.pose.pose.orientation.x = q_final[0]
+                    pose.pose.pose.orientation.y = q_final[1]
+                    pose.pose.pose.orientation.z = q_final[2]
+                    pose.pose.pose.orientation.w = q_final[3]
+                    #self.pub_myPos.publish(pose) 
+
+
+                except KeyError:
+                    print('Aruco not found')
+                    return
                 
-                # Calculate the quaternion that represent the rotation of the aruco respect to the camera
-                r = Rotation.from_rotvec(rvec[i][0])
-                quat_aruco_camera = r.as_quat()
-                # Calculate the inverse quaternion that rapresent the rotation of the camera respect to the aruco
-                quat_camera_aruco = np.array([quat_aruco_camera[0], -quat_aruco_camera[1], -quat_aruco_camera[2], -quat_aruco_camera[3]])
-                # Multiply the quaternion of the aruco respect to the map by the inverse quaternion of the aruco respect to the camera to obtain the quaternion of the camera respect to the map
-                quat_aruco_map = np.array([ArUcos[str(ids[i])]["orientation"][3], ArUcos[str(ids[i])]["orientation"][0], ArUcos[str(ids[i])]["orientation"][1], ArUcos[str(ids[i])]["orientation"][2]])
-                quat_camera_map = np.array([quat_aruco_map[0]*quat_camera_aruco[0] - quat_aruco_map[1]*quat_camera_aruco[1] - quat_aruco_map[2]*quat_camera_aruco[2] - quat_aruco_map[3]*quat_camera_aruco[3],
-                                            quat_aruco_map[0]*quat_camera_aruco[1] + quat_aruco_map[1]*quat_camera_aruco[0] + quat_aruco_map[2]*quat_camera_aruco[3] - quat_aruco_map[3]*quat_camera_aruco[2],
-                                            quat_aruco_map[0]*quat_camera_aruco[2] - quat_aruco_map[1]*quat_camera_aruco[3] + quat_aruco_map[2]*quat_camera_aruco[0] + quat_aruco_map[3]*quat_camera_aruco[1],
-                                            quat_aruco_map[0]*quat_camera_aruco[3] + quat_aruco_map[1]*quat_camera_aruco[2] - quat_aruco_map[2]*quat_camera_aruco[1] + quat_aruco_map[3]*quat_camera_aruco[0]])
-                # Calculate the position of the camera respect to the aruco
-                #camera_position_aruco = self.get_camera_position_from_aruco_position(tvec[i][0], rvec[i][0])
-                # Calculate the position of the aruco respect to the map
-                aruco_position_map = np.array(ArUcos[str(ids[i][0])]["position"])
-                
-                # #Publish the position of the camera respect to the aruco in the map frame
-                # initpose = PoseWithCovarianceStamped()
-                # initpose.header = Header()
-                # initpose.header.stamp = rospy.Time.now()
-                # initpose.header.frame_id = "map"
-                # initpose.pose.pose.position.x = camera_position_in_map[0]
-                # initpose.pose.pose.position.y = camera_position_in_map[1]
-                # initpose.pose.pose.position.z = camera_position_in_map[2]
-                # initpose.pose.pose.orientation.x = camera_quat_in_map[0]
-                # initpose.pose.pose.orientation.y = camera_quat_in_map[1]
-                # initpose.pose.pose.orientation.z = camera_quat_in_map[2]
-                # initpose.pose.pose.orientation.w = camera_quat_in_map[3]
-                # self.pub_myPos.publish(initpose)
+
 
 
 
