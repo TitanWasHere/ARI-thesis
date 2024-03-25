@@ -136,16 +136,41 @@ class detection:
                     rvec_aruco_from_cam = rvec[i][0]
                     tvec_aruco_from_cam = tvec[i][0]
 
+
+                    # # -------------- PROVA ----------------
+                    # R = cv2.Rodrigues(rvec_aruco_from_cam)[0]
+                    # #print('R: ' + str(R))
+                    # #print('tvec_aruco_from_cam: ' + str(tvec_aruco_from_cam))
+                    # #print('tvec_aruco_from_cam: ' + str(tvec_aruco_from_cam))
+
+                    # R_T = np.transpose(R)
+                    # T = np.transpose(tvec_aruco_from_cam)
+
+                    # xyz = np.dot(-R_T, T)
+                    # x, y, z = xyz
+                    
+
+                    # print('x: ' + str(x) + ' y: ' + str(y) + ' z: ' + str(z))
+
+                    # # Transform R_T and T in transformation matrix
+                    # T_new = np.zeros((4,4))
+                    # T_new[:3,:3] = R_T
+                    # T_new[:3,3] = T
+                    # T_new[3,3] = 1
+
+                    # # ------------------------------------
+
+
                     # Rvec to matrix 3x3 with rodrigues
                     rvec_matrix = cv2.Rodrigues(rvec_aruco_from_cam)[0]
 
-                    # orient_zero = np.array([0, 0, 0, 1])
-                    # pose_zero = np.array([0, 0, 0])
-                    # orient_zero = (Quaternion(orient_zero)).rotation_matrix
-                    # zero_mat = np.zeros((4,4))
-                    # zero_mat[3,3] = 1
-                    # zero_mat[:3,:3] = orient_zero
-                    # zero_mat[:3,3] = pose_zero
+                    orient_zero = np.array([0, 0, 0, 1])
+                    pose_zero = np.array([0, 0, 0])
+                    orient_zero = (Quaternion(orient_zero)).rotation_matrix
+                    zero_mat = np.zeros((4,4))
+                    zero_mat[3,3] = 1
+                    zero_mat[:3,:3] = orient_zero
+                    zero_mat[:3,3] = pose_zero
 
                     # create rotation matrix 4x4
                     T_cam = np.zeros((4,4))
@@ -156,6 +181,10 @@ class detection:
                     
                     # Inverse of rot_matrix
                     T_cam = np.linalg.inv(T_cam)
+                    tvec_cam = T_cam[:3, 3]
+                    rvec_cam = T_cam[:3, :3]
+                    q_cam = Quaternion(matrix=np.array(rvec_cam))
+
 
                     # Create the transformation matrix of the aruco
                     T_aruco = np.zeros((4,4))
@@ -168,7 +197,12 @@ class detection:
 
                     # Create the transformation matrix of the camera respect to the aruco
                     #T_cam_aruco = np.dot(zero_mat, T_aruco)
+                    
+                    # QUESTA DOVREBBE ESSERE QUELLA PIU GIUSTA
                     T_cam_aruco = np.dot(T_aruco, T_cam)
+
+                    #T_cam_aruco = np.dot(T_aruco, T_new)
+
 
                     # Extract the position and orientation of the camera respect to the aruco
                     tvec_final = T_cam_aruco[:3,3]
@@ -176,8 +210,8 @@ class detection:
                     rvec_final = T_cam_aruco[:3,:3]
                     
                     rvec_final = np.array(rvec_final)
+                    #print('rvec_final: ' + str(rvec_final))
                     q_final = Quaternion(matrix=rvec_final)
-                    
                     print('tvec_final: ' + str(tvec_final))
 
                     # Publish the position of the camera respect to the aruco
@@ -192,7 +226,7 @@ class detection:
                     pose.pose.pose.orientation.y = q_final[1]
                     pose.pose.pose.orientation.z = q_final[2]
                     pose.pose.pose.orientation.w = q_final[3]
-                    #self.pub_myPos.publish(pose) 
+                    self.pub_myPos.publish(pose) 
 
 
                 except KeyError:
