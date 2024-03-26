@@ -11,6 +11,7 @@ from sensor_msgs.msg import CompressedImage
 from cv_bridge import CvBridge
 from geometry_msgs.msg import PoseStamped
 from geometry_msgs.msg import PoseWithCovarianceStamped
+from geometry_msgs.msg import Pose
 from std_msgs.msg import Header
 from scipy.spatial.transform import Rotation
 import copy
@@ -19,6 +20,8 @@ from pyquaternion import Quaternion
 
 from ArUco_data import *
 from camera_data import *
+import tf2_ros
+import tf2_geometry_msgs 
 #from image_tools.py import ImageTools
 
 INTRINSIC_CAMERA_REALSENSE_1280 = np.array([[fx_RealSense_1280, 0, cx_RealSense_1280], [0, fy_RealSense_1280, cy_RealSense_1280], [0, 0, 1]])
@@ -46,8 +49,6 @@ class detection:
         self.sub_front = rospy.Subscriber('/head_front_camera/color/image_raw/compressed', CompressedImage, self.image_compressed_callback, queue_size=2)
         self.bridge = CvBridge()
         self.received_image = False
-        self.bridge = CvBridge()
-
 
     def print_camera_position(self, tvec, rvec, ids):
         #Print the camera position given the tvec and rvec of the aruco
@@ -127,112 +128,112 @@ class detection:
         return np.array([x, y, z, w])
 
     def manage_frame(self, frame, tvec, rvec, ids, type):
-        if ids is not None:
-            #self.print_camera_position(tvec, rvec, ids)
-            # publish on /initialpose the position of the camera respect to the aruco in the map frame
-            for i in range(len(ids)):
-                try:
-                    aruco = ArUcos[str(ids[i])]
-                    rvec_aruco_from_cam = rvec[i][0]
-                    tvec_aruco_from_cam = tvec[i][0]
+    #     if ids is not None:
+    #         #self.print_camera_position(tvec, rvec, ids)
+    #         # publish on /initialpose the position of the camera respect to the aruco in the map frame
+    #         for i in range(len(ids)):
+    #             try:
+    #                 aruco = ArUcos[str(ids[i])]
+    #                 rvec_aruco_from_cam = rvec[i][0]
+    #                 tvec_aruco_from_cam = tvec[i][0]
 
 
-                    # # -------------- PROVA ----------------
-                    # R = cv2.Rodrigues(rvec_aruco_from_cam)[0]
-                    # #print('R: ' + str(R))
-                    # #print('tvec_aruco_from_cam: ' + str(tvec_aruco_from_cam))
-                    # #print('tvec_aruco_from_cam: ' + str(tvec_aruco_from_cam))
+    #                 # # -------------- PROVA ----------------
+    #                 # R = cv2.Rodrigues(rvec_aruco_from_cam)[0]
+    #                 # #print('R: ' + str(R))
+    #                 # #print('tvec_aruco_from_cam: ' + str(tvec_aruco_from_cam))
+    #                 # #print('tvec_aruco_from_cam: ' + str(tvec_aruco_from_cam))
 
-                    # R_T = np.transpose(R)
-                    # T = np.transpose(tvec_aruco_from_cam)
+    #                 # R_T = np.transpose(R)
+    #                 # T = np.transpose(tvec_aruco_from_cam)
 
-                    # xyz = np.dot(-R_T, T)
-                    # x, y, z = xyz
+    #                 # xyz = np.dot(-R_T, T)
+    #                 # x, y, z = xyz
                     
 
-                    # print('x: ' + str(x) + ' y: ' + str(y) + ' z: ' + str(z))
+    #                 # print('x: ' + str(x) + ' y: ' + str(y) + ' z: ' + str(z))
 
-                    # # Transform R_T and T in transformation matrix
-                    # T_new = np.zeros((4,4))
-                    # T_new[:3,:3] = R_T
-                    # T_new[:3,3] = T
-                    # T_new[3,3] = 1
+    #                 # # Transform R_T and T in transformation matrix
+    #                 # T_new = np.zeros((4,4))
+    #                 # T_new[:3,:3] = R_T
+    #                 # T_new[:3,3] = T
+    #                 # T_new[3,3] = 1
 
-                    # # ------------------------------------
+    #                 # # ------------------------------------
 
 
-                    # Rvec to matrix 3x3 with rodrigues
-                    rvec_matrix = cv2.Rodrigues(rvec_aruco_from_cam)[0]
+    #                 # Rvec to matrix 3x3 with rodrigues
+    #                 rvec_matrix = cv2.Rodrigues(rvec_aruco_from_cam)[0]
 
-                    orient_zero = np.array([0, 0, 0, 1])
-                    pose_zero = np.array([0, 0, 0])
-                    orient_zero = (Quaternion(orient_zero)).rotation_matrix
-                    zero_mat = np.zeros((4,4))
-                    zero_mat[3,3] = 1
-                    zero_mat[:3,:3] = orient_zero
-                    zero_mat[:3,3] = pose_zero
+    #                 orient_zero = np.array([0, 0, 0, 1])
+    #                 pose_zero = np.array([0, 0, 0])
+    #                 orient_zero = (Quaternion(orient_zero)).rotation_matrix
+    #                 zero_mat = np.zeros((4,4))
+    #                 zero_mat[3,3] = 1
+    #                 zero_mat[:3,:3] = orient_zero
+    #                 zero_mat[:3,3] = pose_zero
 
-                    # create rotation matrix 4x4
-                    T_cam = np.zeros((4,4))
-                    T_cam[:3,:3] = rvec_matrix
-                    T_cam[3,3] = 1
-                    #print(T_cam[:3, 3])
-                    T_cam[:3,3] = tvec_aruco_from_cam
+    #                 # create rotation matrix 4x4
+    #                 T_cam = np.zeros((4,4))
+    #                 T_cam[:3,:3] = rvec_matrix
+    #                 T_cam[3,3] = 1
+    #                 #print(T_cam[:3, 3])
+    #                 T_cam[:3,3] = tvec_aruco_from_cam
                     
-                    # Inverse of rot_matrix
-                    T_cam = np.linalg.inv(T_cam)
-                    tvec_cam = T_cam[:3, 3]
-                    rvec_cam = T_cam[:3, :3]
-                    q_cam = Quaternion(matrix=np.array(rvec_cam))
+    #                 # Inverse of rot_matrix
+    #                 T_cam = np.linalg.inv(T_cam)
+    #                 tvec_cam = T_cam[:3, 3]
+    #                 rvec_cam = T_cam[:3, :3]
+    #                 q_cam = Quaternion(matrix=np.array(rvec_cam))
 
 
-                    # Create the transformation matrix of the aruco
-                    T_aruco = np.zeros((4,4))
-                    # aruco["orientation"] is a quaternion
-                    quat_aruco = np.array(aruco["orientation"])
-                    quat_aruco = Quaternion(quat_aruco)
-                    T_aruco[:3,:3] = quat_aruco.rotation_matrix
-                    T_aruco[3,3] = 1
-                    T_aruco[:3,3] = np.array(aruco["position"])
+    #                 # Create the transformation matrix of the aruco
+    #                 T_aruco = np.zeros((4,4))
+    #                 # aruco["orientation"] is a quaternion
+    #                 quat_aruco = np.array(aruco["orientation"])
+    #                 quat_aruco = Quaternion(quat_aruco)
+    #                 T_aruco[:3,:3] = quat_aruco.rotation_matrix
+    #                 T_aruco[3,3] = 1
+    #                 T_aruco[:3,3] = np.array(aruco["position"])
 
-                    # Create the transformation matrix of the camera respect to the aruco
-                    #T_cam_aruco = np.dot(zero_mat, T_aruco)
+    #                 # Create the transformation matrix of the camera respect to the aruco
+    #                 #T_cam_aruco = np.dot(zero_mat, T_aruco)
                     
-                    # QUESTA DOVREBBE ESSERE QUELLA PIU GIUSTA
-                    T_cam_aruco = np.dot(T_aruco, T_cam)
+    #                 # QUESTA DOVREBBE ESSERE QUELLA PIU GIUSTA
+    #                 T_cam_aruco = np.dot(T_aruco, T_cam)
 
-                    #T_cam_aruco = np.dot(T_aruco, T_new)
+    #                 #T_cam_aruco = np.dot(T_aruco, T_new)
 
 
-                    # Extract the position and orientation of the camera respect to the aruco
-                    tvec_final = T_cam_aruco[:3,3]
-                    rvec_final = np.eye(3)
-                    rvec_final = T_cam_aruco[:3,:3]
+    #                 # Extract the position and orientation of the camera respect to the aruco
+    #                 tvec_final = T_cam_aruco[:3,3]
+    #                 rvec_final = np.eye(3)
+    #                 rvec_final = T_cam_aruco[:3,:3]
                     
-                    rvec_final = np.array(rvec_final)
-                    #print('rvec_final: ' + str(rvec_final))
-                    q_final = Quaternion(matrix=rvec_final)
-                    print('tvec_final: ' + str(tvec_final))
+    #                 rvec_final = np.array(rvec_final)
+    #                 #print('rvec_final: ' + str(rvec_final))
+    #                 q_final = Quaternion(matrix=rvec_final)
+    #                 print('tvec_final: ' + str(tvec_final))
 
-                    # Publish the position of the camera respect to the aruco
-                    pose = PoseWithCovarianceStamped()
-                    pose.header = Header()
-                    pose.header.stamp = rospy.Time.now()
-                    pose.header.frame_id = "map"
-                    pose.pose.pose.position.x = tvec_final[0]
-                    pose.pose.pose.position.y = tvec_final[1]
-                    pose.pose.pose.position.z = tvec_final[2]
-                    pose.pose.pose.orientation.x = q_final[0]
-                    pose.pose.pose.orientation.y = q_final[1]
-                    pose.pose.pose.orientation.z = q_final[2]
-                    pose.pose.pose.orientation.w = q_final[3]
-                    self.pub_myPos.publish(pose) 
+    #                 # Publish the position of the camera respect to the aruco
+    #                 pose = PoseWithCovarianceStamped()
+    #                 pose.header = Header()
+    #                 pose.header.stamp = rospy.Time.now()
+    #                 pose.header.frame_id = "map"
+    #                 pose.pose.pose.position.x = tvec_final[0]
+    #                 pose.pose.pose.position.y = tvec_final[1]
+    #                 pose.pose.pose.position.z = tvec_final[2]
+    #                 pose.pose.pose.orientation.x = q_final[0]
+    #                 pose.pose.pose.orientation.y = q_final[1]
+    #                 pose.pose.pose.orientation.z = q_final[2]
+    #                 pose.pose.pose.orientation.w = q_final[3]
+    #                 self.pub_myPos.publish(pose) 
 
 
-                except KeyError:
-                    print('Aruco not found')
-                    return
-                
+    #             except KeyError:
+    #                 print('Aruco not found')
+    #                 return
+
 
 
 
@@ -242,7 +243,58 @@ class detection:
         elif type == "front":
             self.pub_front.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
     
+    # def manage_frame(self, frame, tvec, rvec, ids, type):
+    #     if ids is not None:
+    #         for i in range(len(ids)):
+    #             try:
+    #                 aruco = ArUcos[str(ids[i])]
 
+    #                 rvec_rmatrix = cv2.Rodrigues(rvec[i])[0]
+    #                 my_matrix = np.zeros((4,4))
+    #                 my_matrix[:3,:3] = rvec_rmatrix
+    #                 my_matrix[3,3] = 1
+    #                 my_matrix[:3,3] = tvec[i]
+    #                 my_matrix = np.linalg.inv(my_matrix)
+
+    #                 rot_quat = Quaternion(matrix=my_matrix[:3,:3])
+
+    #                 my_pose = Pose()
+    #                 my_pose.position.x = my_matrix[0][3]
+    #                 my_pose.position.y = my_matrix[1][3]
+    #                 my_pose.position.z = my_matrix[2][3]
+    #                 my_pose.orientation.x = rot_quat[0]
+    #                 my_pose.orientation.y = rot_quat[1]
+    #                 my_pose.orientation.z = rot_quat[2]
+    #                 my_pose.orientation.w = rot_quat[3]
+
+    #                 tf_buffer = tf2_ros.Buffer(rospy.Duration(100.0))
+    #                 tf_listener = tf2_ros.TransformListener(tf_buffer)
+
+    #                 pose_stamped = tf2_geometry_msgs.PoseStamped()
+    #                 pose_stamped.header.stamp = rospy.Time(0)
+    #                 pose_stamped.header.frame_id = "aruco"
+    #                 pose_stamped.pose = my_pose
+
+    #                 transform = tf_buffer.lookup_transform("map", "aruco", pose_stamped.header.stamp, rospy.Duration(1.0))
+    #                 pose_transformed = tf2_geometry_msgs.do_transform_pose(pose_stamped, transform)
+                        
+
+    #                 pose = PoseWithCovarianceStamped()
+    #                 pose.header = Header()
+    #                 pose.header.stamp = rospy.Time.now()
+    #                 pose.header.frame_id = "map"
+    #                 pose.pose.pose = pose_stamped.pose
+                    
+    #                 self.pub_myPos.publish(pose)
+    #             except KeyError:
+    #                 print('Aruco not found')
+    #                 return
+
+
+    #     if type == "torso":
+    #         self.pub_torso.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
+    #     elif type == "front":
+    #         self.pub_front.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
 
 if __name__ == '__main__':
     try:

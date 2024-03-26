@@ -16,7 +16,7 @@ class ARI:
     
     def __init__(self):
         self.respjson = "../json/responses.json" # Name of the json file
-        self.topicjson = "../topics.json" # Name of the json file where are the topic on listening
+        self.topicjson = "../json/topics.json" # Name of the json file where are the topic on listening
 
         self.startkwd = "chiara" # Start keyword
         self.forsestartkwd = "ciao chiara"
