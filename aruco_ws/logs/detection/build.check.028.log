@@ -38,15 +38,6 @@ CMake Deprecation Warning at /usr/src/googletest/googletest/CMakeLists.txt:48 (c
 [36m--[0m Using Python nosetests: /usr/bin/nosetests-2.7
 [36m--[0m catkin 0.7.29
 [36m--[0m BUILD_SHARED_LIBS is on
-[31m[1mCMake Error[0m at /opt/ros/melodic/share/catkin/cmake/catkin_install_python.cmake:68 (message):
-  catkin_install_python() called with non-existing file
-  '/home/user/exchange/aruco_ws/src/detection/detection'.
-[36mCall Stack (most recent call first):[0m
-  CMakeLists.txt:211 (catkin_install_python)
-
-
-[36m--[0m Configuring incomplete, errors occurred!
-See also "/home/user/exchange/aruco_ws/build/detection/CMakeFiles/CMakeOutput.log".
-See also "/home/user/exchange/aruco_ws/build/detection/CMakeFiles/CMakeError.log".
-Makefile:689: recipe for target 'cmake_check_build_system' failed
-make: *** [cmake_check_build_system] Error 1
+[36m--[0m Configuring done
+[36m--[0m Generating done
+[36m--[0m Build files have been written to: /home/user/exchange/aruco_ws/build/detection
