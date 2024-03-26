@@ -21,6 +21,7 @@ from pyquaternion import Quaternion
 from ArUco_data import *
 from camera_data import *
 import tf2_ros
+import tf
 import tf2_geometry_msgs 
 #from image_tools.py import ImageTools
 
@@ -127,7 +128,7 @@ class detection:
         w = w0 * w1 - x0 * x1 - y0 * y1 - z0 * z1
         return np.array([x, y, z, w])
 
-    def manage_frame(self, frame, tvec, rvec, ids, type):
+    #def manage_frame(self, frame, tvec, rvec, ids, type):
     #     if ids is not None:
     #         #self.print_camera_position(tvec, rvec, ids)
     #         # publish on /initialpose the position of the camera respect to the aruco in the map frame
@@ -238,63 +239,63 @@ class detection:
 
 
 
+        # if type == "torso":
+        #     self.pub_torso.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
+        # elif type == "front":
+        #     self.pub_front.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
+    
+    def manage_frame(self, frame, tvec, rvec, ids, type):
+        if ids is not None:
+            # for i in range(len(ids)):
+            #     try:
+            #         aruco = ArUcos[str(ids[i])]
+
+            #         rvec_rmatrix = cv2.Rodrigues(rvec[i])[0]
+            #         my_matrix = np.zeros((4,4))
+            #         my_matrix[:3,:3] = rvec_rmatrix
+            #         my_matrix[3,3] = 1
+            #         my_matrix[:3,3] = tvec[i]
+            #         my_matrix = np.linalg.inv(my_matrix)
+
+            #         rot_quat = Quaternion(matrix=my_matrix[:3,:3])
+
+            #         frame_map_aruco = np.zeros((4,4))
+            #         frame_map_aruco[:3,:3] = Quaternion(aruco["orientation"]).rotation_matrix
+            #         frame_map_aruco[3,3] = 1
+            #         frame_map_aruco[:3,3] = aruco["position"]
+
+            #         new_mat = np.dot(frame_map_aruco, my_matrix)
+            #         rot_quat = Quaternion(matrix=new_mat[:3,:3])
+
+
+            #         new_pose = PoseWithCovarianceStamped()
+            #         new_pose.header = Header()
+            #         new_pose.header.stamp = rospy.Time.now()
+            #         new_pose.header.frame_id = "map"
+            #         new_pose.pose.pose.position.x = new_mat[0,3]
+            #         new_pose.pose.pose.position.y = new_mat[1,3]
+            #         new_pose.pose.pose.position.z = new_mat[2,3]
+            #         new_pose.pose.pose.orientation.x = rot_quat[0]
+            #         new_pose.pose.pose.orientation.y = rot_quat[1]
+            #         new_pose.pose.pose.orientation.z = rot_quat[2]
+            #         new_pose.pose.pose.orientation.w = rot_quat[3]
+
+
+
+            #         self.pub_myPos.publish(new_pose)
+
+
+
+
+            #     except KeyError:
+            #         print('Aruco not found')
+            #         return
+
+
         if type == "torso":
             self.pub_torso.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
         elif type == "front":
             self.pub_front.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
-    
-    # def manage_frame(self, frame, tvec, rvec, ids, type):
-    #     if ids is not None:
-    #         for i in range(len(ids)):
-    #             try:
-    #                 aruco = ArUcos[str(ids[i])]
-
-    #                 rvec_rmatrix = cv2.Rodrigues(rvec[i])[0]
-    #                 my_matrix = np.zeros((4,4))
-    #                 my_matrix[:3,:3] = rvec_rmatrix
-    #                 my_matrix[3,3] = 1
-    #                 my_matrix[:3,3] = tvec[i]
-    #                 my_matrix = np.linalg.inv(my_matrix)
-
-    #                 rot_quat = Quaternion(matrix=my_matrix[:3,:3])
-
-    #                 my_pose = Pose()
-    #                 my_pose.position.x = my_matrix[0][3]
-    #                 my_pose.position.y = my_matrix[1][3]
-    #                 my_pose.position.z = my_matrix[2][3]
-    #                 my_pose.orientation.x = rot_quat[0]
-    #                 my_pose.orientation.y = rot_quat[1]
-    #                 my_pose.orientation.z = rot_quat[2]
-    #                 my_pose.orientation.w = rot_quat[3]
-
-    #                 tf_buffer = tf2_ros.Buffer(rospy.Duration(100.0))
-    #                 tf_listener = tf2_ros.TransformListener(tf_buffer)
-
-    #                 pose_stamped = tf2_geometry_msgs.PoseStamped()
-    #                 pose_stamped.header.stamp = rospy.Time(0)
-    #                 pose_stamped.header.frame_id = "aruco"
-    #                 pose_stamped.pose = my_pose
-
-    #                 transform = tf_buffer.lookup_transform("map", "aruco", pose_stamped.header.stamp, rospy.Duration(1.0))
-    #                 pose_transformed = tf2_geometry_msgs.do_transform_pose(pose_stamped, transform)
-                        
-
-    #                 pose = PoseWithCovarianceStamped()
-    #                 pose.header = Header()
-    #                 pose.header.stamp = rospy.Time.now()
-    #                 pose.header.frame_id = "map"
-    #                 pose.pose.pose = pose_stamped.pose
-                    
-    #                 self.pub_myPos.publish(pose)
-    #             except KeyError:
-    #                 print('Aruco not found')
-    #                 return
-
-
-    #     if type == "torso":
-    #         self.pub_torso.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
-    #     elif type == "front":
-    #         self.pub_front.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
 
 if __name__ == '__main__':
     try:
