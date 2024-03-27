@@ -4,6 +4,9 @@
     <node name="republish_head" type="republish" pkg="image_transport" output="screen" args="compressed in:=/head_front_camera/color/image_raw/compressed raw out:=/head_front_camera/color/image_raw" />
     <!--<node name="republish_torso" type="republish" pkg="image_transport" output="screen" args="raw in:=/torso_front_camera/color/image_raw raw out:=/torso_front_camera/color/image_raw" />-->
     <!--<node pkg="tf" type="static_transform_publisher" name="aruco" args="2.85708618164 -1.28423094749 0.05 0.0 0.0 0.989162684798 0.146823645927 map aruco 100"  />-->
-    <node pkg="detection" type="fixed_tf_broadcaster.py" name="broadcaster_fixed" />
-    <node name="detection" type="aruco_detect.py" pkg="detection" output="screen" />
+    <!--<node pkg="detection" type="fixed_tf_broadcaster.py" name="broadcaster_fixed" />-->
+    <node name="detect_aruco" type="aruco_detect.py" pkg="detection" output="screen" />
+
+    <node pkg="tf2_ros" type="static_transform_publisher" name="link1_broadcaster" args="2.85708618164 -1.28423094749 0.05 0.0 0.0 0.989162684798 0.146823645927 map aruco" />
+    
 </launch>
