@@ -80,8 +80,8 @@ class detection:
         
         frame, tvec, rvec, ids = self.get_pose(image_wrp)
         
-        #cv2.imshow('image_front', image_wrp)
-        #cv2.waitKey(1)
+        cv2.imshow('image_front', image_wrp)
+        cv2.waitKey(1)
         
         self.manage_frame(frame, tvec, rvec, ids, "front")
         #self.pub_torso.publish(self.bridge.cv2_to_imgmsg(frame, "bgr8"))
@@ -246,50 +246,54 @@ class detection:
     
     def manage_frame(self, frame, tvec, rvec, ids, type):
         if ids is not None:
-            # for i in range(len(ids)):
-            #     try:
-            #         aruco = ArUcos[str(ids[i])]
+            for i in range(len(ids)):
+                try:
+                    aruco = ArUcos[str(ids[i])]
 
-            #         rvec_rmatrix = cv2.Rodrigues(rvec[i])[0]
-            #         my_matrix = np.zeros((4,4))
-            #         my_matrix[:3,:3] = rvec_rmatrix
-            #         my_matrix[3,3] = 1
-            #         my_matrix[:3,3] = tvec[i]
-            #         my_matrix = np.linalg.inv(my_matrix)
+                    rvec_rmatrix = cv2.Rodrigues(rvec[i])[0]
+                    my_matrix = np.zeros((4,4))
+                    my_matrix[:3,:3] = rvec_rmatrix
+                    my_matrix[3,3] = 1
+                    my_matrix[:3,3] = tvec[i]
+                    my_matrix = np.linalg.inv(my_matrix)
 
-            #         rot_quat = Quaternion(matrix=my_matrix[:3,:3])
+                    rot_quat = Quaternion(matrix=my_matrix[:3,:3])
 
-            #         frame_map_aruco = np.zeros((4,4))
-            #         frame_map_aruco[:3,:3] = Quaternion(aruco["orientation"]).rotation_matrix
-            #         frame_map_aruco[3,3] = 1
-            #         frame_map_aruco[:3,3] = aruco["position"]
+                    my_pose = Pose()
+                    my_pose.position.x = my_matrix[0][3]
+                    my_pose.position.y = my_matrix[1][3]
+                    my_pose.position.z = my_matrix[2][3]
+                    my_pose.orientation.x = rot_quat[0]
+                    my_pose.orientation.y = rot_quat[1]
+                    my_pose.orientation.z = rot_quat[2]
+                    my_pose.orientation.w = rot_quat[3]
 
-            #         new_mat = np.dot(frame_map_aruco, my_matrix)
-            #         rot_quat = Quaternion(matrix=new_mat[:3,:3])
+                    tf_buffer = tf2_ros.Buffer(rospy.Duration(100.0))
+                    tf_listener = tf2_ros.TransformListener(tf_buffer)
 
+                    pose_stamped = tf2_geometry_msgs.PoseStamped()
+                    pose_stamped.header.stamp = rospy.Time(0)
+                    pose_stamped.header.frame_id = "aruco"
+                    pose_stamped.pose = my_pose
 
-            #         new_pose = PoseWithCovarianceStamped()
-            #         new_pose.header = Header()
-            #         new_pose.header.stamp = rospy.Time.now()
-            #         new_pose.header.frame_id = "map"
-            #         new_pose.pose.pose.position.x = new_mat[0,3]
-            #         new_pose.pose.pose.position.y = new_mat[1,3]
-            #         new_pose.pose.pose.position.z = new_mat[2,3]
-            #         new_pose.pose.pose.orientation.x = rot_quat[0]
-            #         new_pose.pose.pose.orientation.y = rot_quat[1]
-            #         new_pose.pose.pose.orientation.z = rot_quat[2]
-            #         new_pose.pose.pose.orientation.w = rot_quat[3]
-
+                    transform = tf_buffer.lookup_transform("map", "aruco", pose_stamped.header.stamp, rospy.Duration(1.0))
+                    pose_transformed = tf2_geometry_msgs.do_transform_pose(pose_stamped, transform)
 
 
-            #         self.pub_myPos.publish(new_pose)
+                    pose = PoseWithCovarianceStamped()
+                    pose.header = Header()
+                    pose.header.stamp = rospy.Time.now()
+                    pose.header.frame_id = "map"
+                    pose.pose.pose = pose_stamped.pose
+
+                    self.pub_myPos.publish(pose)
 
 
 
 
-            #     except KeyError:
-            #         print('Aruco not found')
-            #         return
+                except KeyError:
+                    print('Aruco not found')
+                    return
 
 
         if type == "torso":

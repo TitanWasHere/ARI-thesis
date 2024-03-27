@@ -24,3 +24,7 @@ k2_RealSense_1280 = -0.2717244716038656
 k3_RealSense_1280 = 0.0
 p1_RealSense_1280 = -0.002867946281892625
 p2_RealSense_1280 = -9.69782173585606e-05
+
+# Position torso camera respect to odom frame
+position_torso_camera = [-0.106549417688, 0.0214074875957, 1.09765735695]
+orientation_torso_camera = [0.00679285729054, 0.36165720942, -0.0031636557936, 0.932281010128]
