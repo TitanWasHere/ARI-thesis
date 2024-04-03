@@ -13,7 +13,6 @@ from geometry_msgs.msg import PoseStamped
 from geometry_msgs.msg import PoseWithCovarianceStamped
 from geometry_msgs.msg import Pose
 from std_msgs.msg import Header
-from scipy.spatial.transform import Rotation
 import copy
 from time import sleep
 from pyquaternion import Quaternion
@@ -22,6 +21,7 @@ from ArUco_data import *
 from camera_data import *
 import tf2_ros
 import tf
+from geometry_msgs.msg import TransformStamped
 import tf2_geometry_msgs 
 #from image_tools.py import ImageTools
 
@@ -42,14 +42,44 @@ rot_z = np.array([
 
 class detection:
     def __init__(self):
-        rospy.init_node('detection')
+        rospy.init_node('detection', anonymous=True)
         self.pub_torso = rospy.Publisher('/torso_front_camera/color/aruco', Image, queue_size=2)
         self.pub_front = rospy.Publisher('/head_front_camera/color/aruco', Image, queue_size=2)
         self.pub_myPos = rospy.Publisher('/initialpose', PoseWithCovarianceStamped, queue_size=2)
         self.sub_torso = rospy.Subscriber('/torso_front_camera/color/image_raw', Image, self.image_callback, queue_size=2)
         self.sub_front = rospy.Subscriber('/head_front_camera/color/image_raw/compressed', CompressedImage, self.image_compressed_callback, queue_size=2)
+        self.listener = tf.TransformListener()
+        self.sub_tf = rospy.Subscriber('/tf', TransformStamped, self.transform_callback)
+
         self.bridge = CvBridge()
         self.received_image = False
+
+        self.map_to_odom = None
+        self.odom_to_baseFootprint = None
+        self.baseFootprint_to_camera = None
+        self.map_to_aruco = None
+
+
+    def transform_callback(self, msg):
+        trans, rot = self.get_transform("base_footprint", "torso_front_camera_color_frame")
+        self.baseFootprint_to_camera = {"position": np.array([trans[0], trans[1], trans[2]]) , "orientation": np.array([rot[3], rot[0], rot[1], rot[2]])} 
+        trans, rot = self.get_transform("odom", "base_footprint")
+        self.odom_to_baseFootprint = {"position": np.array([trans[0], trans[1], trans[2]]) , "orientation": np.array([rot[3], rot[0], rot[1], rot[2]])} 
+        trans, rot = self.get_transform("map", "odom")
+        self.map_to_odom = {"position": np.array([trans[0], trans[1], trans[2]]) , "orientation": np.array([rot[3], rot[0], rot[1], rot[2]])} 
+        trans, rot = self.get_transform("map", "aruco")
+        self.map_to_aruco = {"position": np.array([trans[0], trans[1], trans[2]]) , "orientation": np.array([rot[3], rot[0], rot[1], rot[2]])} 
+        
+    def get_transform(self, frame_x, frame_y):
+        try:
+            now = rospy.Time.now()
+            self.listener.waitForTransform(frame_x, frame_y, now, rospy.Duration(1.0))
+            (trans, rot) = self.listener.lookupTransform(frame_x, frame_y, now)
+            return trans, rot
+        except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException) as e:
+            rospy.logwarn("Unable to lookup transform from /%s to /%s: %s", frame_x, frame_y, e)
+
+
 
     def print_camera_position(self, tvec, rvec, ids):
         #Print the camera position given the tvec and rvec of the aruco
@@ -117,77 +147,63 @@ class detection:
             #frame = cv2.aruco.drawAxis(frame, INTRINSIC_CAMERA, DISTORTION_CAMERA, rvec, tvec, 0.1)
             return frame, tvec, rvec, ids
         return frame, None, None, None
-
-    def quaternion_multiplication(self, q0, q1):
-        # Multiplication of two quaternions
-        x0, y0, z0, w0 = q0
-        x1, y1, z1, w1 = q1
-        x = w0 * x1 + x0 * w1 + y0 * z1 - z0 * y1
-        y = w0 * y1 - x0 * z1 + y0 * w1 + z0 * x1
-        z = w0 * z1 + x0 * y1 - y0 * x1 + z0 * w1
-        w = w0 * w1 - x0 * x1 - y0 * y1 - z0 * z1
-        return np.array([x, y, z, w])
     
+    
+
     def manage_frame(self, frame, tvec, rvec, ids, type):
         if ids is not None:
             for i in range(len(ids)):
                 try:
                     aruco = ArUcos[str(ids[i])]
 
-                    camera_pos = position_base_footprint_camera
-                    ori_camera = Quaternion(np.array(orientation_base_footprint_camera))
-                    # Trasformation matrix from odom to camera
-                    camera_ori_matrix = ori_camera.rotation_matrix
-                    odom_T_camera = np.zeros((4, 4))
-                    odom_T_camera[:3, :3] = camera_ori_matrix
-                    odom_T_camera[:3, 3] = camera_pos
-                    odom_T_camera[3, 3] = 1
+                    while self.map_to_odom is None and self.odom_to_baseFootprint is None and self.baseFootprint_to_camera is None and self.map_to_aruco is None:
+                        print('Waiting for tf...')
+                        sleep(1)
 
-                    # Trasformation matrix from camera to aruco
-                
-                    rvec_mat = cv2.Rodrigues(rvec[i])[0]
+                    #base_to_camera, base_to_odom, map_to_odom, map_to_aruco = self.get_tf2_positions()
                     camera_T_aruco = np.zeros((4,4))
-                    camera_T_aruco[:3, :3] = rvec_mat
-                    camera_T_aruco[:3, 3] = tvec[i]
+                    camera_T_aruco[0:3, 0:3] = cv2.Rodrigues(rvec[i])[0]
+                    camera_T_aruco[0:3, 3] = tvec[i]
                     camera_T_aruco[3, 3] = 1
 
-                    odom_T_aruco = np.dot(odom_T_camera, camera_T_aruco)
+                    #quat_orientation_base_to_camera = Quaternion(np.array([base_to_camera.transform.rotation.w, base_to_camera.transform.rotation.x, base_to_camera.transform.rotation.y, base_to_camera.transform.rotation.z]))
+                    quat_orientation_base_to_camera = Quaternion(np.array([self.baseFootprint_to_camera["orientation"][0], self.baseFootprint_to_camera["orientation"][1], self.baseFootprint_to_camera["orientation"][2], baseFootprint_to_camera["orientation"][3]])) 
+                    base_T_camera = np.zeros((4,4))
+                    base_T_camera[0:3, 0:3] = quat_orientation_base_to_camera.rotation_matrix
+                    #base_T_camera[0:3, 3] = np.array([base_to_camera.transform.translation.x, base_to_camera.transform.translation.y, base_to_camera.transform.translation.z])
+                    base_T_camera[0:3, 3] = np.array([self.baseFootprint_to_camera["position"][0], self.baseFootprint_to_camera["position"][1], self.baseFootprint_to_camera["position"][2]])
+                    base_T_camera[3, 3] = 1
 
-                    aruco_T_odom = np.linalg.inv(odom_T_aruco)
+                    base_T_aruco = np.dot(base_T_camera, camera_T_aruco)
+                    aruco_T_base = np.linalg.inv(base_T_aruco)
 
-                    aruco_pos_in_map = aruco['position']
-                    aruco_ori_in_map = aruco['orientation']
-                    aruco_ori_in_map = Quaternion(np.array(aruco_ori_in_map)).rotation_matrix
+                    
 
-                    map_T_aruco = np.zeros((4, 4))
-                    map_T_aruco[:3, :3] = aruco_ori_in_map
-                    map_T_aruco[:3, 3] = aruco_pos_in_map
+                    #quat_map_aruco = Quaternion(np.array([map_to_aruco.transform.rotation.w, map_to_aruco.transform.rotation.x, map_to_aruco.transform.rotation.y, map_to_aruco.transform.rotation.z]))
+                    quat_map_aruco = Quaternion(np.array([self.map_to_aruco["orientation"][0], self.map_to_aruco["orientation"][1], self.map_to_aruco["orientation"][2], self.map_to_aruco["orientation"][3]]))
+                    map_T_aruco = np.zeros((4,4))
+                    map_T_aruco[0:3, 0:3] = quat_map_aruco.rotation_matrix
+                    #map_T_aruco[0:3, 3] = np.array([map_to_aruco.transform.translation.x, map_to_aruco.transform.translation.y, map_to_aruco.transform.translation.z])
+                    map_T_aruco[0:3, 3] = np.array([self.map_to_aruco["position"][0], self.map_to_aruco["position"][1], self.map_to_aruco["position"][2]])
                     map_T_aruco[3, 3] = 1
 
-                    map_T_odom = np.dot(map_T_aruco, aruco_T_odom)
+                    map_T_base = np.dot(map_T_aruco, aruco_T_base)
+                    quat_map_base = Quaternion(matrix=map_T_base[0:3, 0:3])
+                    
+                    pose = PoseWithCovarianceStamped()
+                    pose.header = Header()
+                    pose.header.stamp = rospy.Time.now()
+                    pose.header.frame_id = "map"
+                    pose.pose.pose.position.x = map_T_base[0, 3]
+                    pose.pose.pose.position.y = map_T_base[1, 3]
+                    pose.pose.pose.position.z = map_T_base[2, 3]
+                    pose.pose.pose.orientation.x = quat_map_base[1]
+                    pose.pose.pose.orientation.y = quat_map_base[2]
+                    pose.pose.pose.orientation.z = quat_map_base[3]
+                    pose.pose.pose.orientation.w = quat_map_base[0]
 
-                    tx = map_T_odom[0, 3]
-                    ty = map_T_odom[1, 3]
-                    tz = map_T_odom[2, 3]
+                    self.pub_myPos.publish(pose)
 
-                    quat = Quaternion(matrix=map_T_odom[:3, :3])
-                    qx = quat[0]
-                    qy = quat[1]
-                    qz = quat[2]
-                    qw = quat[3]
-
-                    new_pose = PoseWithCovarianceStamped()
-                    new_pose.header = Header()
-                    new_pose.header.stamp = rospy.Time.now()
-                    new_pose.header.frame_id = "map"
-                    new_pose.pose.pose.position.x = tx
-                    new_pose.pose.pose.position.y = ty
-                    new_pose.pose.pose.position.z = tz
-                    new_pose.pose.pose.orientation.x = qx
-                    new_pose.pose.pose.orientation.y = qy
-                    new_pose.pose.pose.orientation.z = qz
-                    new_pose.pose.pose.orientation.w = qw
-                    self.pub_myPos.publish(new_pose)
 
                 except KeyError:
                     print('Aruco not found')

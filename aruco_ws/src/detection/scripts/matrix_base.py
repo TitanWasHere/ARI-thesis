@@ -1,26 +1,25 @@
+#!/usr/bin/env python
+
 import rospy
-from std_msgs.msg import String
-import tf2_ros
-import geometry_msgs.msg
-from pyquaternion import Quaternion
+import tf
+from geometry_msgs.msg import TransformStamped
 
-
-
-def main():
-    rospy.init_node('matrix', anonymous=True)
-
-    # get position and orientation from 2 frames with tf2
-    tfBuffer = tf2_ros.Buffer(rospy.Duration(10))
-    listener = tf2_ros.TransformListener(tfBuffer)
-    
-    trasformation = tfBuffer.lookup_transform("base_footprint", "torso_front_camera_color_frame", rospy.Time(), rospy.Duration(1.0))
-    #trasformation = tfBuffer.lookup_transform("base_footprint", "base_link", rospy.Time(), rospy.Duration(1.0))
-    print(trasformation) 
-            
-    
-    
-if __name__ == '__main__':
+def transform_callback(msg):
     try:
-        main()
-    except rospy.ROSInterruptException:
-        pass
+        now = rospy.Time.now()
+        listener.waitForTransform("odom", "map", now, rospy.Duration(1.0))
+        (trans, rot) = listener.lookupTransform("odom", "map", now)
+        print("Transform from map to odom:")
+        print("Translation: ", trans)
+        print("Rotation: ", rot)
+    except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException) as e:
+        rospy.logwarn("Unable to lookup transform from frame_x to frame_y: %s", e)
+
+if __name__ == '__main__':
+    rospy.init_node('transform_listener')
+
+    listener = tf.TransformListener()
+
+    #rospy.Subscriber("/tf", TransformStamped, transform_callback)
+    transform_callback(None)
+    rospy.spin()
