@@ -135,10 +135,9 @@ class detection:
                     aruco = ArUcos[str(ids[i])]
 
                     camera_pos = position_base_footprint_camera
-                    camera_ori = np.array(orientation_base_footprint_camera) # expressed in quaternion
-
+                    ori_camera = Quaternion(np.array(orientation_base_footprint_camera))
                     # Trasformation matrix from odom to camera
-                    camera_ori_matrix = Quaternion(matrix=camera_ori).rotation_matrix
+                    camera_ori_matrix = ori_camera.rotation_matrix
                     odom_T_camera = np.zeros((4, 4))
                     odom_T_camera[:3, :3] = camera_ori_matrix
                     odom_T_camera[:3, 3] = camera_pos
@@ -158,7 +157,7 @@ class detection:
 
                     aruco_pos_in_map = aruco['position']
                     aruco_ori_in_map = aruco['orientation']
-                    aruco_ori_in_map = Quaternion(matrix=aruco_ori_in_map).rotation_matrix
+                    aruco_ori_in_map = Quaternion(np.array(aruco_ori_in_map)).rotation_matrix
 
                     map_T_aruco = np.zeros((4, 4))
                     map_T_aruco[:3, :3] = aruco_ori_in_map
