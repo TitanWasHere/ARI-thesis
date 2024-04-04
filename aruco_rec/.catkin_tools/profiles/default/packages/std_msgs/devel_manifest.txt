@@ -1,5 +1,0 @@
-std_msgs
-/home/user/exchange/aruco_rec/devel/.private/std_msgs/cmake.lock /home/user/exchange/aruco_rec/devel/./cmake.lock
-/home/user/exchange/aruco_rec/devel/.private/std_msgs/share/std_msgs/cmake/std_msgsConfig-version.cmake /home/user/exchange/aruco_rec/devel/share/std_msgs/cmake/std_msgsConfig-version.cmake
-/home/user/exchange/aruco_rec/devel/.private/std_msgs/share/std_msgs/cmake/std_msgsConfig.cmake /home/user/exchange/aruco_rec/devel/share/std_msgs/cmake/std_msgsConfig.cmake
-/home/user/exchange/aruco_rec/devel/.private/std_msgs/lib/pkgconfig/std_msgs.pc /home/user/exchange/aruco_rec/devel/lib/pkgconfig/std_msgs.pc
