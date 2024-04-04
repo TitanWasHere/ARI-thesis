@@ -166,6 +166,14 @@ class detection:
                     camera_T_aruco[0:3, 3] = tvec[i]
                     camera_T_aruco[3, 3] = 1
 
+                    quat_odom_to_base = Quaternion(np.array([self.odom_to_baseFootprint["orientation"][0], self.odom_to_baseFootprint["orientation"][1], self.odom_to_baseFootprint["orientation"][2], self.odom_to_baseFootprint["orientation"][3]]))
+                    odom_T_base = np.zeros((4,4))
+                    odom_T_base[0:3, 0:3] = quat_odom_to_base.rotation_matrix
+                    odom_T_base[0:3, 3] = np.array([self.odom_to_baseFootprint["position"][0], self.odom_to_baseFootprint["position"][1], self.odom_to_baseFootprint["position"][2]])
+                    odom_T_base[3, 3] = 1
+
+
+
                     #quat_orientation_base_to_camera = Quaternion(np.array([base_to_camera.transform.rotation.w, base_to_camera.transform.rotation.x, base_to_camera.transform.rotation.y, base_to_camera.transform.rotation.z]))
                     quat_orientation_base_to_camera = Quaternion(np.array([self.baseFootprint_to_camera["orientation"][0], self.baseFootprint_to_camera["orientation"][1], self.baseFootprint_to_camera["orientation"][2], baseFootprint_to_camera["orientation"][3]])) 
                     base_T_camera = np.zeros((4,4))
@@ -174,6 +182,7 @@ class detection:
                     base_T_camera[0:3, 3] = np.array([self.baseFootprint_to_camera["position"][0], self.baseFootprint_to_camera["position"][1], self.baseFootprint_to_camera["position"][2]])
                     base_T_camera[3, 3] = 1
 
+                    base_T_aruco = np.dot(odom_T_base, base_T_camera)
                     base_T_aruco = np.dot(base_T_camera, camera_T_aruco)
                     aruco_T_base = np.linalg.inv(base_T_aruco)
 
