@@ -58,6 +58,7 @@ class detection:
         self.odom_to_baseFootprint = None
         self.baseFootprint_to_camera = None
         self.map_to_aruco = None
+        self.map_to_baseFootprint = None
 
 
     def transform_callback(self, msg):
@@ -69,6 +70,10 @@ class detection:
         self.map_to_odom = {"position": np.array([trans[0], trans[1], trans[2]]) , "orientation": np.array([rot[3], rot[0], rot[1], rot[2]])} 
         trans, rot = self.get_transform("map", "aruco")
         self.map_to_aruco = {"position": np.array([trans[0], trans[1], trans[2]]) , "orientation": np.array([rot[3], rot[0], rot[1], rot[2]])} 
+        #print("map_to_aruco: " + str(self.map_to_aruco))
+
+        trans, rot = self.get_transform("map", "base_footprint")
+        self.map_to_baseFootprint = {"position": np.array([trans[0], trans[1], trans[2]]) , "orientation": np.array([rot[3], rot[0], rot[1], rot[2]])} 
         
     def get_transform(self, frame_x, frame_y):
         try:
@@ -156,7 +161,7 @@ class detection:
                 try:
                     aruco = ArUcos[str(ids[i])]
 
-                    while self.map_to_odom is None and self.odom_to_baseFootprint is None and self.baseFootprint_to_camera is None and self.map_to_aruco is None:
+                    while self.map_to_odom is None or self.odom_to_baseFootprint is None or self.baseFootprint_to_camera is None or self.map_to_aruco is None or self.map_to_baseFootprint is None:
                         print('Waiting for tf...')
                         sleep(1)
 
@@ -166,11 +171,11 @@ class detection:
                     camera_T_aruco[0:3, 3] = tvec[i]
                     camera_T_aruco[3, 3] = 1
 
-                    quat_odom_to_base = Quaternion(np.array([self.odom_to_baseFootprint["orientation"][0], self.odom_to_baseFootprint["orientation"][1], self.odom_to_baseFootprint["orientation"][2], self.odom_to_baseFootprint["orientation"][3]]))
-                    odom_T_base = np.zeros((4,4))
-                    odom_T_base[0:3, 0:3] = quat_odom_to_base.rotation_matrix
-                    odom_T_base[0:3, 3] = np.array([self.odom_to_baseFootprint["position"][0], self.odom_to_baseFootprint["position"][1], self.odom_to_baseFootprint["position"][2]])
-                    odom_T_base[3, 3] = 1
+                    # quat_odom_to_base = Quaternion(np.array([self.odom_to_baseFootprint["orientation"][0], self.odom_to_baseFootprint["orientation"][1], self.odom_to_baseFootprint["orientation"][2], self.odom_to_baseFootprint["orientation"][3]]))
+                    # odom_T_base = np.zeros((4,4))
+                    # odom_T_base[0:3, 0:3] = quat_odom_to_base.rotation_matrix
+                    # odom_T_base[0:3, 3] = np.array([self.odom_to_baseFootprint["position"][0], self.odom_to_baseFootprint["position"][1], self.odom_to_baseFootprint["position"][2]])
+                    # odom_T_base[3, 3] = 1
 
 
 
@@ -182,7 +187,7 @@ class detection:
                     base_T_camera[0:3, 3] = np.array([self.baseFootprint_to_camera["position"][0], self.baseFootprint_to_camera["position"][1], self.baseFootprint_to_camera["position"][2]])
                     base_T_camera[3, 3] = 1
 
-                    base_T_aruco = np.dot(odom_T_base, base_T_camera)
+                    # base_T_aruco = np.dot(odom_T_base, base_T_camera)
                     base_T_aruco = np.dot(base_T_camera, camera_T_aruco)
                     aruco_T_base = np.linalg.inv(base_T_aruco)
 
@@ -196,8 +201,21 @@ class detection:
                     map_T_aruco[0:3, 3] = np.array([self.map_to_aruco["position"][0], self.map_to_aruco["position"][1], self.map_to_aruco["position"][2]])
                     map_T_aruco[3, 3] = 1
 
+                    # quat_map_aruco = Quaternion(aruco["orientation"])
+                    # map_T_aruco = np.zeros((4,4))
+                    # map_T_aruco[0:3, 0:3] = quat_map_aruco.rotation_matrix
+                    # map_T_aruco[0:3, 3] = np.array(aruco["position"])
+                    # map_T_aruco[3, 3] = 1  
+
                     map_T_base = np.dot(map_T_aruco, aruco_T_base)
                     quat_map_base = Quaternion(matrix=map_T_base[0:3, 0:3])
+
+
+                    ## PROVA ##
+                    print(self.map_to_baseFootprint)
+                    quat_map_basefootprint = Quaternion(np.array([self.map_to_baseFootprint["orientation"][0], self.map_to_baseFootprint["orientation"][1], self.map_to_baseFootprint["orientation"][2], self.map_to_baseFootprint["orientation"][3]]))
+                    print("quat_map_basefootprint: " + str(quat_map_basefootprint))
+                    ###########
                     
                     pose = PoseWithCovarianceStamped()
                     pose.header = Header()
@@ -206,12 +224,13 @@ class detection:
                     pose.pose.pose.position.x = map_T_base[0, 3]
                     pose.pose.pose.position.y = map_T_base[1, 3]
                     pose.pose.pose.position.z = map_T_base[2, 3]
-                    pose.pose.pose.orientation.x = quat_map_base[1]
-                    pose.pose.pose.orientation.y = quat_map_base[2]
-                    pose.pose.pose.orientation.z = quat_map_base[3]
-                    pose.pose.pose.orientation.w = quat_map_base[0]
+                    pose.pose.pose.orientation.x = quat_map_basefootprint[1]
+                    pose.pose.pose.orientation.y = quat_map_basefootprint[2]
+                    pose.pose.pose.orientation.z = quat_map_basefootprint[3]
+                    pose.pose.pose.orientation.w = quat_map_basefootprint[0]
 
                     self.pub_myPos.publish(pose)
+                    print("pose: " + str(pose))
 
 
                 except KeyError:
