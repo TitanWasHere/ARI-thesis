@@ -1,0 +1,2 @@
+speech
+-DCATKIN_DEVEL_PREFIX=/home/pal/andrea_dir/speech_ws/devel -DCMAKE_INSTALL_PREFIX=/home/pal/andrea_dir/speech_ws/install -G Unix Makefiles

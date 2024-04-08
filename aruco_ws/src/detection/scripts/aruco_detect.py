@@ -229,7 +229,7 @@ class detection:
                     pose.pose.pose.orientation.z = quat_map_basefootprint[3]
                     pose.pose.pose.orientation.w = quat_map_basefootprint[0]
 
-                    self.pub_myPos.publish(pose)
+                    #self.pub_myPos.publish(pose)
                     print("pose: " + str(pose))
 
 

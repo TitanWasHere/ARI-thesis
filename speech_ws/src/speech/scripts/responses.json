@@ -1,0 +1,7 @@
+{
+    "saluti": ["startmsg"] ,
+    "chiacchiera": ["chiacchiera1","chiacchiera2","chiacchiera3"],
+    "tecnico": ["tecnico1" , "tecnico2", "tecnico3"],
+    "goto" : ["goto1", "goto2", "goto3"],
+    "addio": ["addio"] 
+}
