@@ -1,4 +1,45 @@
-## ARI - Thesis ##
-This is the library which contains all the added code to make work ARI
+## ARI Workspace 
 
-### Andrea Gravili ###
+### Introduction
+| The ARI workspace contains all the files for the robot management. The main files developed are those for the calibration (using ArUco markers), the control and the talking / listening to the robot.  | ![ARI](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimages.squarespace-cdn.com%2Fcontent%2Fv1%2F615ef432328446710cb07969%2F1646651854249-NDOV5VC9Q0OI5RBQ4RAW%2FARI_2.jpg&f=1&nofb=1&ipt=3c219b69e95f1ddf0d4755ba09de3f81d22b73784a981dd9418411b109dac360&ipo=images "a title" ) |
+| --- | --- |
+### Setup
+To setup and start working with ARI you need to follow these steps:
+1. Clone the repository into the docker on your computer
+2. Source the main files external the workspace
+>###### Pal setup
+>```bash
+>source ~/../../opt/pal/ferrum/setup.bash
+>```
+
+>###### Ros setup
+>```bash
+>source ~/../../opt/ros/melodic/setup.bash
+>```
+
+>###### Connect to ARI 16-c
+>```bash
+>export ROS_MASTER_URI=http://ari-16c:11311
+>```
+
+>###### Set the IP of the computer
+>Remember to set the IP of the computer to the one of the docker. In this case the IP is:
+>```bash
+>export ROS_IP=10.196.192.3
+>```
+
+>###### Run Rviz for ARI
+>To have the position of ARI in the map and all the features of the robot you need to run the following command:
+>```bash
+>rosrun rviz rviz -d `rospack find ari_2dnav`/config/rviz/navigation.rviz
+>```
+### Files
+The main files of the workspace are:
+<!--Todo-->
+- **calibration**: Contains the files for the calibration of the robot using ArUco markers
+- **control**: Contains the files for the control of the robot
+- **talking**: Contains the files for the talking and listening to the robot
+- **launch**: Contains the launch files for the robot
+
+### Launch
+Each launch file is used to start a specific part of the robot, or one to start them simultaneously. <!--Todo-->
