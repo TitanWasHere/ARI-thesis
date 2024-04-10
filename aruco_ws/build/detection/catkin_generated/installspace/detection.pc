@@ -1,8 +1,0 @@
-prefix=/home/user/exchange/aruco_ws/install
-
-Name: detection
-Description: Description of detection
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: geometry_msgs roscpp rospy sensor_msgs std_msgs

@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/user/exchange/ARI_ws/devel/.private/ari_pkg/setup.sh

@@ -1,1 +1,0 @@
-/home/user/exchange/aruco_ws/devel/.private/detection/share/detection/cmake/detectionConfig.cmake

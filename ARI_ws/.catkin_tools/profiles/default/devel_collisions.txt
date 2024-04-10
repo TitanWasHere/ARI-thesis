@@ -1,0 +1,1 @@
+/home/user/exchange/ARI_ws/devel/./cmake.lock 1

@@ -1,0 +1,5 @@
+ari_pkg
+/home/user/exchange/ARI_ws/devel/.private/ari_pkg/cmake.lock /home/user/exchange/ARI_ws/devel/./cmake.lock
+/home/user/exchange/ARI_ws/devel/.private/ari_pkg/share/ari_pkg/cmake/ari_pkgConfig-version.cmake /home/user/exchange/ARI_ws/devel/share/ari_pkg/cmake/ari_pkgConfig-version.cmake
+/home/user/exchange/ARI_ws/devel/.private/ari_pkg/share/ari_pkg/cmake/ari_pkgConfig.cmake /home/user/exchange/ARI_ws/devel/share/ari_pkg/cmake/ari_pkgConfig.cmake
+/home/user/exchange/ARI_ws/devel/.private/ari_pkg/lib/pkgconfig/ari_pkg.pc /home/user/exchange/ARI_ws/devel/lib/pkgconfig/ari_pkg.pc
