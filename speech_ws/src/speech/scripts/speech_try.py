@@ -1,5 +1,4 @@
 #/usr/bin/env python
-
 import rospy
 import json
 import speech_recognition as sr
