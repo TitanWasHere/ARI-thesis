@@ -1,0 +1,8 @@
+prefix=/home/user/exchange/ARI_ws/devel/.private/ari_pkg
+
+Name: ari_pkg
+Description: Description of ari_pkg
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

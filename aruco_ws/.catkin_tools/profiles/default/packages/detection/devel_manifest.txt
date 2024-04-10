@@ -1,5 +1,0 @@
-detection
-/home/user/exchange/aruco_ws/devel/.private/detection/cmake.lock /home/user/exchange/aruco_ws/devel/./cmake.lock
-/home/user/exchange/aruco_ws/devel/.private/detection/share/detection/cmake/detectionConfig.cmake /home/user/exchange/aruco_ws/devel/share/detection/cmake/detectionConfig.cmake
-/home/user/exchange/aruco_ws/devel/.private/detection/share/detection/cmake/detectionConfig-version.cmake /home/user/exchange/aruco_ws/devel/share/detection/cmake/detectionConfig-version.cmake
-/home/user/exchange/aruco_ws/devel/.private/detection/lib/pkgconfig/detection.pc /home/user/exchange/aruco_ws/devel/lib/pkgconfig/detection.pc
