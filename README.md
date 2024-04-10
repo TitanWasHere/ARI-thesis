@@ -1,7 +1,7 @@
 ## ARI Workspace 
 
 ### Introduction
-| The ARI workspace contains all the files for the robot management. The main files developed are those for the calibration (using ArUco markers), the control and the talking / listening to the robot.  | <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimages.squarespace-cdn.com%2Fcontent%2Fv1%2F615ef432328446710cb07969%2F1646651854249-NDOV5VC9Q0OI5RBQ4RAW%2FARI_2.jpg&f=1&nofb=1&ipt=3c219b69e95f1ddf0d4755ba09de3f81d22b73784a981dd9418411b109dac360&ipo=images" width=500> |
+| The ARI workspace contains all the files for the robot management. The main files developed are those for the calibration, the control and the talking / listening to the robot.  | <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimages.squarespace-cdn.com%2Fcontent%2Fv1%2F615ef432328446710cb07969%2F1646651854249-NDOV5VC9Q0OI5RBQ4RAW%2FARI_2.jpg&f=1&nofb=1&ipt=3c219b69e95f1ddf0d4755ba09de3f81d22b73784a981dd9418411b109dac360&ipo=images" width=500> |
 | --- | --- |
 ### Setup
 To setup and start working with ARI you need to follow these steps:
