@@ -38,11 +38,21 @@ CMake Deprecation Warning at /usr/src/googletest/googletest/CMakeLists.txt:48 (c
 [36m--[0m Using Python nosetests: /usr/bin/nosetests-2.7
 [36m--[0m catkin 0.7.29
 [36m--[0m BUILD_SHARED_LIBS is on
-[31m[1mCMake Error[0m at /opt/ros/melodic/share/catkin/cmake/catkin_install_python.cmake:68 (message):
-  catkin_install_python() called with non-existing file
-  '/home/user/exchange/aruco_ws/src/detection/src/camera_data'.
+[36m--[0m Could NOT find pal_navigation_msgs (missing: pal_navigation_msgs_DIR)
+[36m--[0m Could not find the required component 'pal_navigation_msgs'. The following CMake error indicates that you either need to install the package with the same name or change your environment so that it can be found.
+[31m[1mCMake Error[0m at /opt/ros/melodic/share/catkin/cmake/catkinConfig.cmake:83 (find_package):
+  Could not find a package configuration file provided by
+  "pal_navigation_msgs" with any of the following names:
+
+    pal_navigation_msgsConfig.cmake
+    pal_navigation_msgs-config.cmake
+
+  Add the installation prefix of "pal_navigation_msgs" to CMAKE_PREFIX_PATH
+  or set "pal_navigation_msgs_DIR" to a directory containing one of the above
+  files.  If "pal_navigation_msgs" provides a separate development package or
+  SDK, be sure it has been installed.
 [36mCall Stack (most recent call first):[0m
-  CMakeLists.txt:211 (catkin_install_python)
+  CMakeLists.txt:4 (find_package)
 
 
 [36m--[0m Configuring incomplete, errors occurred!
