@@ -14,6 +14,7 @@ from geometry_msgs.msg import PoseWithCovarianceStamped
 from geometry_msgs.msg import Pose
 from std_msgs.msg import Header
 import copy
+from pal_navigation_msgs.msg import GoToPOIActionGoal
 from time import sleep
 from pyquaternion import Quaternion
 
@@ -59,6 +60,22 @@ class detection:
         self.baseFootprint_to_camera = None
         self.map_to_aruco = None
         self.map_to_baseFootprint = None
+
+
+        self.goal = rospy.Publisher('/poi_navigation_server/go_to_poi/goal', GoToPOIActionGoal, queue_size=2)
+        self.move()
+
+    def move(self):
+        self.goal_msg = GoToPOIActionGoal()
+        self.goal_msg.header.seq = 0
+        self.goal_msg.header.stamp.secs = 0
+        self.goal_msg.header.stamp.nsecs = 0
+        self.goal_msg.header.frame_id = 'map'
+        self.goal_msg.goal_id.stamp.secs = 0
+        self.goal_msg.goal_id.stamp.nsecs = 0
+        self.goal_msg.goal_id.id = ''
+        self.goal_msg.goal.poi.data = 'ari_16c_dockstation'
+        self.goal.publish(self.goal_msg)
 
 
     def transform_callback(self, msg):
