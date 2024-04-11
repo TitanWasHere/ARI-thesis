@@ -4,12 +4,13 @@ import json
 import speech_recognition as sr
 import os
 from pal_navigation_msgs.msg import GoToPOIActionGoal
-
-
+from visualization_msgs.msg import InteractiveMarkerUpdate
 
 class SpeechRecognizer:
     def __init__(self):
         self.goal = rospy.Publisher('/poi_navigation_server/go_to_poi/goal', GoToPOIActionGoal, queue_size=2)
+        self.POIs = rospy.Subscriber('/poi_marker_server/update', InteractiveMarkerUpdate, self.POI_callback)
+        self.allMarkers = {}
         self.continue_listen = True
         rospy.init_node('speech_recognizer')
         self.path_wavs = "../wavs/andre/"
@@ -30,6 +31,15 @@ class SpeechRecognizer:
 
         # Avvia l'ascolto del microfono
         self.listen_microphone()
+
+    def POI_callback(self, data):
+        if data.markers == []:
+            return
+        
+        for marker in data.markers:
+            self.allMarkers[marker.name] = marker.pose.position
+
+
 
     def listen_microphone(self):
         while self.continue_listen is True:
@@ -89,17 +99,24 @@ class SpeechRecognizer:
             for name, p in self.poi.items():
                 for item in p:
                     if item.lower() in spoken_text:
-                        self.goal_msg = GoToPOIActionGoal()
-                        self.goal_msg.header.seq = 0
-                        self.goal_msg.header.stamp = rospy.Time.now()
-                        self.goal_msg.header.frame_id = 'map'
-                        self.goal_msg.goal_id.stamp = rospy.Time.now()
-                        self.goal_msg.goal_id.id = ''
-                        self.goal_msg.goal.poi.data = name
-                        self.goal.publish(self.goal_msg)
-                        return "poi_found"
+                        
+                        # Check if "name" is really a POI from the topic server
+                        if name in self.allMarkers:
+                            self.goal_msg = GoToPOIActionGoal()
+                            self.goal_msg.header.seq = 0
+                            self.goal_msg.header.stamp = rospy.Time.now()
+                            self.goal_msg.header.frame_id = 'map'
+                            self.goal_msg.goal_id.stamp = rospy.Time.now()
+                            self.goal_msg.goal_id.id = ''
+                            self.goal_msg.goal.poi.data = name
+                            self.goal.publish(self.goal_msg)
+                            return "poi_found"
             
             return "poi_not_found"
+        
+       
+
+
             
 
 if __name__ == '__main__':

@@ -17,7 +17,7 @@ import copy
 #from pal_navigation_msgs.msg import GoToPOIActionGoal
 from time import sleep
 from pyquaternion import Quaternion
-
+from std_msgs.msg import String
 from ArUco_data import *
 from camera_data import *
 import tf2_ros
