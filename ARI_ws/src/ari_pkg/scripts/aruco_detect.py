@@ -176,11 +176,19 @@ class detection:
         if ids is not None:
             for i in range(len(ids)):
                 try:
-                    aruco = ArUcos[str(ids[i])]
-
-                    while self.map_to_odom is None or self.odom_to_baseFootprint is None or self.baseFootprint_to_camera is None or self.map_to_aruco is None or self.map_to_baseFootprint is None:
+                    # aruco = ArUcos[str(ids[i])]
+                    # sleep(2)
+                    
+                    while self.map_to_odom is None or self.odom_to_baseFootprint is None or self.baseFootprint_to_camera is None or self.map_to_aruco is None :
                         print('Waiting for tf...')
+                        print(self.map_to_odom)
+                        print(self.odom_to_baseFootprint)
+                        print(self.baseFootprint_to_camera)
+                        print(self.map_to_baseFootprint)
+                        print(self.map_to_aruco)
                         sleep(1)
+
+                    
 
                     #base_to_camera, base_to_odom, map_to_odom, map_to_aruco = self.get_tf2_positions()
                     camera_T_aruco = np.zeros((4,4))
@@ -228,11 +236,11 @@ class detection:
                     quat_map_base = Quaternion(matrix=map_T_base[0:3, 0:3])
 
 
-                    ## PROVA ##
-                    print(self.map_to_baseFootprint)
-                    quat_map_basefootprint = Quaternion(np.array([self.map_to_baseFootprint["orientation"][0], self.map_to_baseFootprint["orientation"][1], self.map_to_baseFootprint["orientation"][2], self.map_to_baseFootprint["orientation"][3]]))
-                    print("quat_map_basefootprint: " + str(quat_map_basefootprint))
-                    ###########
+                    # ## PROVA ##
+                    # print(self.map_to_baseFootprint)
+                    # quat_map_basefootprint = Quaternion(np.array([self.map_to_baseFootprint["orientation"][0], self.map_to_baseFootprint["orientation"][1], self.map_to_baseFootprint["orientation"][2], self.map_to_baseFootprint["orientation"][3]]))
+                    # print("quat_map_basefootprint: " + str(quat_map_basefootprint))
+                    # ###########
                     
                     pose = PoseWithCovarianceStamped()
                     pose.header = Header()
@@ -241,12 +249,12 @@ class detection:
                     pose.pose.pose.position.x = map_T_base[0, 3]
                     pose.pose.pose.position.y = map_T_base[1, 3]
                     pose.pose.pose.position.z = map_T_base[2, 3]
-                    pose.pose.pose.orientation.x = quat_map_basefootprint[1]
-                    pose.pose.pose.orientation.y = quat_map_basefootprint[2]
-                    pose.pose.pose.orientation.z = quat_map_basefootprint[3]
-                    pose.pose.pose.orientation.w = quat_map_basefootprint[0]
+                    pose.pose.pose.orientation.x = quat_map_base[1]
+                    pose.pose.pose.orientation.y = quat_map_base[2]
+                    pose.pose.pose.orientation.z = quat_map_base[3]
+                    pose.pose.pose.orientation.w = quat_map_base[0]
 
-                    #self.pub_myPos.publish(pose)
+                    self.pub_myPos.publish(pose)
                     print("pose: " + str(pose))
 
 
