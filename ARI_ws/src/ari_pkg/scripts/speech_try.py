@@ -3,11 +3,13 @@ import rospy
 import json
 import speech_recognition as sr
 import os
+from pal_navigation_msgs.msg import GoToPOIActionGoal
 
 
 
 class SpeechRecognizer:
     def __init__(self):
+        self.goal = rospy.Publisher('/poi_navigation_server/go_to_poi/goal', GoToPOIActionGoal, queue_size=2)
         self.continue_listen = True
         rospy.init_node('speech_recognizer')
         self.path_wavs = "../wavs/andre/"
@@ -57,6 +59,9 @@ class SpeechRecognizer:
                                     # Allora salvo in un var json:
                                     # { "topic" : [ n , i ] }
                                     self.resp_cycle[topic][1] = (self.resp_cycle[topic][1]+1)%(self.resp_cycle[topic][0])
+                                    if topic == "goto":
+                                        # !!!!! TODO CREATE WAV FOR POI NOT FOUND
+                                        response = self.goto_POI(spoken_text)
                             
                                 rospy.loginfo("Trovata parola chiave: %s, Risposta: %s", keyword, response)
                             
@@ -76,6 +81,25 @@ class SpeechRecognizer:
                 rospy.loginfo("errore durante la richiesta a Google")
         
             self.listen_microphone()
+        
+        def goto_POI(self, spoken_text):
+            with open('points_of_interest.json', 'r') as file:
+                self.poi = json.load(file)
+
+            for name, p in self.poi.items():
+                for item in p:
+                    if item.lower() in spoken_text:
+                        self.goal_msg = GoToPOIActionGoal()
+                        self.goal_msg.header.seq = 0
+                        self.goal_msg.header.stamp = rospy.Time.now()
+                        self.goal_msg.header.frame_id = 'map'
+                        self.goal_msg.goal_id.stamp = rospy.Time.now()
+                        self.goal_msg.goal_id.id = ''
+                        self.goal_msg.goal.poi.data = name
+                        self.goal.publish(self.goal_msg)
+                        return "poi_found"
+            
+            return "poi_not_found"
             
 
 if __name__ == '__main__':
