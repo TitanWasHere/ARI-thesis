@@ -7,14 +7,14 @@
 To setup and start working with ARI you need to follow these steps:
 1. Clone the repository into the docker on your computer
 2. Source the main files external the workspace
->###### Pal setup
->```bash
->source ~/../../opt/pal/ferrum/setup.bash
->```
-
 >###### Ros setup
 >```bash
 >source ~/../../opt/ros/melodic/setup.bash
+>```
+
+>###### Pal setup
+>```bash
+>source ~/../../opt/pal/ferrum/setup.bash
 >```
 
 >###### Connect to ARI 16-c
