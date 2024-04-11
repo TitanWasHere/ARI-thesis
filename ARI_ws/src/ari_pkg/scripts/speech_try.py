@@ -71,7 +71,10 @@ class SpeechRecognizer:
                                     self.resp_cycle[topic][1] = (self.resp_cycle[topic][1]+1)%(self.resp_cycle[topic][0])
                                     if topic == "goto":
                                         # !!!!! TODO CREATE WAV FOR POI NOT FOUND
-                                        response = self.goto_POI(spoken_text)
+                                        status = self.goto_POI(spoken_text)
+                                        print(status)
+                                    
+                                        
                             
                                 rospy.loginfo("Trovata parola chiave: %s, Risposta: %s", keyword, response)
                             
@@ -92,27 +95,27 @@ class SpeechRecognizer:
         
             self.listen_microphone()
         
-        def goto_POI(self, spoken_text):
-            with open('points_of_interest.json', 'r') as file:
-                self.poi = json.load(file)
+    def goto_POI(self, spoken_text):
+        with open('points_of_interest.json', 'r') as file:
+            self.poi = json.load(file)
 
-            for name, p in self.poi.items():
-                for item in p:
-                    if item.lower() in spoken_text:
+        for name, p in self.poi.items():
+            for item in p:
+                if item.lower() in spoken_text:
                         
                         # Check if "name" is really a POI from the topic server
-                        if name in self.allMarkers:
-                            self.goal_msg = GoToPOIActionGoal()
-                            self.goal_msg.header.seq = 0
-                            self.goal_msg.header.stamp = rospy.Time.now()
-                            self.goal_msg.header.frame_id = 'map'
-                            self.goal_msg.goal_id.stamp = rospy.Time.now()
-                            self.goal_msg.goal_id.id = ''
-                            self.goal_msg.goal.poi.data = name
-                            self.goal.publish(self.goal_msg)
-                            return "poi_found"
-            
-            return "poi_not_found"
+                    if name in self.allMarkers:
+                        self.goal_msg = GoToPOIActionGoal()
+                        self.goal_msg.header.seq = 0
+                        self.goal_msg.header.stamp = rospy.Time.now()
+                        self.goal_msg.header.frame_id = 'map'
+                        self.goal_msg.goal_id.stamp = rospy.Time.now()
+                        self.goal_msg.goal_id.id = ''
+                        self.goal_msg.goal.poi.data = name
+                        self.goal.publish(self.goal_msg)
+                        return "poi_found"
+        
+        return "poi_not_found"
         
        
 
