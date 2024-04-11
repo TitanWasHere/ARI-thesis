@@ -1,4 +1,4 @@
 {
     "ari_16c_dockstation": ["dock", "ricarica", "stazione"],
-    "exit_lab": ["uscita", "laboratorio"]
+    "exit_lab": ["uscita", "porta", "uscita del laboratorio"]
 }
