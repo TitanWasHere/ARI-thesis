@@ -57,6 +57,8 @@ class SpeechRecognizer:
                         if keyword.lower() in spoken_text:
                             if topic is "arrivederci":
                                 continue_listen = False
+                                os.system("aplay " + self.path_wavs + response + ".wav")
+                                exit()
                             else:
                                 
                                 response = self.responses.get(topic, "No")
