@@ -12,6 +12,7 @@ class PrintPOIs:
         rospy.init_node('print_pois')
         self.POIs = rospy.Subscriber('/poi_marker_server/update', InteractiveMarkerUpdate, self.POI_callback)
         
+        
     def POI_callback(self, data):
         print(data)
     
