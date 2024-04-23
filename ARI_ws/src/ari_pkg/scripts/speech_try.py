@@ -5,11 +5,16 @@ import speech_recognition as sr
 import os
 from pal_navigation_msgs.msg import GoToPOIActionGoal
 from visualization_msgs.msg import InteractiveMarkerUpdate
+from std_msgs.msg import String
 
 class SpeechRecognizer:
     def __init__(self):
         self.goal = rospy.Publisher('/poi_navigation_server/go_to_poi/goal', GoToPOIActionGoal, queue_size=2)
         self.POIs = rospy.Subscriber('/poi_marker_server/update', InteractiveMarkerUpdate, self.POI_callback)
+        self.pub_check = rospy.Publisher('/POI/move/check', String, queue_size=2)
+
+
+
         self.allMarkers = {}
         self.continue_listen = True
         rospy.init_node('speech_recognizer')
@@ -73,8 +78,14 @@ class SpeechRecognizer:
                                     self.resp_cycle[topic][1] = (self.resp_cycle[topic][1]+1)%(self.resp_cycle[topic][0])
                                     if topic == "goto":
                                         # !!!!! TODO CREATE WAV FOR POI NOT FOUND
-                                        status = self.goto_POI(spoken_text)
-                                        print(status)
+                                        # status = self.goto_POI(spoken_text)
+                                        # print(status)
+                                        # wait for response from the subscriber node
+                                        self.pub_check.publish(spoken_text)
+
+                                        res = rospy.wait_for_message('/POI/move/status', String, timeout=10)
+                                        
+                                        
                                     
                                         
                             

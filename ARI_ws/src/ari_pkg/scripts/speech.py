@@ -5,7 +5,8 @@ import speech_recognition as sr
 from std_msgs.msg import String, Float64MultiArray
 import os
 from pal_navigation_msgs.msg import GoToPOIActionGoal
-
+from gtts import gTTS
+import subprocess
 from visualization_msgs.msg import InteractiveMarkerUpdate
 
 class SpeechRecognizer:
@@ -75,18 +76,14 @@ class SpeechRecognizer:
                                             response = "no_POI"
                                     except rospy.ROSException:
                                         # TODO play wav for the unknown error
-                                        print("Timeout reached")
                                         res = "error"
+                                        rospy.logerr("Timeout reached")
+                                        tts = gTTS(text="Errore, non è stato trovato niente, prova a ripetere", lang='it')
+                                        tts.save("error.wav")
+                                        os.system("aplay error.wav")
+                                        os.system("rm error.wav")   
+                                        response = "error"
 
-
-
-
-                                    # [] no POI
-                                    # [x] POI named x
-                                    # [x, y, z, ...] more than 1 POI found
-
-                                
-                                    
                             
                             rospy.loginfo("Trovata parola chiave: %s, Risposta: %s", keyword, response)
                         

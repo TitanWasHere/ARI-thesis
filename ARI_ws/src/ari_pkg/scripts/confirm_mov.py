@@ -4,7 +4,8 @@ from collections import deque
 import json
 import speech_recognition as sr
 from std_msgs.msg import String, Float64MultiArray
-import os
+from gtts import gTTS
+import subprocess 
 from pal_navigation_msgs.msg import GoToPOIActionGoal
 from visualization_msgs.msg import InteractiveMarkerUpdate
 
