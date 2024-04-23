@@ -84,8 +84,8 @@ class SpeechRecognizer:
                                         os.system("rm error.wav")   
                                         response = "error"
 
-                            
-                            rospy.loginfo("Trovata parola chiave: %s, Risposta: %s", keyword, response)
+                            if response is not "error":
+                                rospy.loginfo("Trovata parola chiave: %s, Risposta: %s", keyword, response)
                         
 
                         os.system("aplay " + self.path_wavs + response + ".wav")

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
 <launch>
     <node name="speech_recognizer" type="speech.py" pkg="ari_pkg" output="screen" />
-    <node name="check_POI" type="confirm_POI.py" pkg="ari_pkg" output="screen" />
+    <node name="check_POI" type="confirm_mov.py" pkg="ari_pkg" output="screen" />
 </launch>

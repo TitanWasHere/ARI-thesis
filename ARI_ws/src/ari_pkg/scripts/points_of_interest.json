@@ -1,4 +1,10 @@
 {
     "ari_16c_dockstation": ["dock", "ricarica", "stazione"],
-    "exit_lab": ["uscita", "porta", "uscita del laboratorio"]
+    "exit_lab": ["uscita", "porta", "uscita del laboratorio", "porta del laboratorio"],
+    "angolo_nord_ovest": ["angolo nord ovest", "nord ovest", "angolo"],
+    "angolo_nord_est": ["angolo nord est", "nord est", "angolo"],
+    "angolo_sud_ovest": ["angolo sud ovest", "sud ovest", "angolo"],
+    "angolo_sud_est": ["angolo sud est", "sud est", "angolo"],
+    "ponte_povo1": ["ponte povo 1", "ponte povo uno", "ponte di povo 1", "ponte di povo uno", "ponte"],
+    "ponte_povo2": ["ponte povo 2", "ponte povo due", "ponte di povo 2", "ponte di povo due", "ponte"]
 }
