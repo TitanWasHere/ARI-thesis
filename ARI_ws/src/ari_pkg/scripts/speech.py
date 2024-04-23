@@ -1,4 +1,4 @@
-#/usr/bin/env python
+#!/usr/bin/env python
 import rospy
 import json
 import speech_recognition as sr
@@ -16,12 +16,18 @@ class SpeechRecognizer:
         self.check_goto = rospy.Publisher('/POI/move/check', String, queue_size=2)
         self.path_wavs = "../wavs/andre/"
         self.resp_cycle = {}
+
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(current_dir, 'nome_file.json')
+
+
         # Carica il file JSON con i topic
-        with open('topics.json', 'r') as file:
+        self.current_dir = os.path.dirname(os.path.abspath(__file__))
+        with open(os.path.join(self.current_dir,'topics.json'), 'r') as file:
             self.topics = json.load(file)
             
         # Carica il file JSON con le risposte
-        with open('responses.json', 'r') as file:
+        with open(os.path.join(self.current_dir,'responses.json'), 'r') as file:
             self.responses = json.load(file)
             
             for r in self.responses:
@@ -49,12 +55,12 @@ class SpeechRecognizer:
                 for keyword in keywords:
                     if keyword.lower() in spoken_text:
                         # IN CASO IL TOPIC SIA "ARRIVEDERCI" ESCI DAL PROGRAMMA
-                        if topic is "arrivederci":
+                        if topic is "addio":
                             continue_listen = False
                             response = "addio"
-                            os.system("aplay " + self.path_wavs + response + ".wav")
+                            os.system("aplay " + os.path.join(self.current_dir,self.path_wavs) + response + ".wav")
                             exit()
-                        # Altrimenti può essere un topic di tipo solo speech oppure anche di movimento
+                        # Altrimenti puo' essere un topic di tipo solo speech oppure anche di movimento
                         else:
                                 
                             response = self.responses.get(topic, "No")
@@ -70,7 +76,7 @@ class SpeechRecognizer:
                                     # "error" : something went wrong --> TODO make a wav for this 
                                     # TODO: make a directory only for the responses of the movement (wavs)
                                     try:
-                                        res = rospy.wait_for_message('/POI/move/status', String, timeout=10)
+                                        res = rospy.wait_for_message('/POI/move/status', String, timeout=None)
                                         print(res)
                                         if res.data == "not_found":
                                             response = "no_POI"
@@ -78,17 +84,13 @@ class SpeechRecognizer:
                                         # TODO play wav for the unknown error
                                         res = "error"
                                         rospy.logerr("Timeout reached")
-                                        tts = gTTS(text="Errore, non è stato trovato niente, prova a ripetere", lang='it')
-                                        tts.save("error.wav")
-                                        os.system("aplay error.wav")
-                                        os.system("rm error.wav")   
-                                        response = "error"
+                                        self.say_something("Errore, non ho stato trovato niente, prova a ripetere")
 
                             if response is not "error":
                                 rospy.loginfo("Trovata parola chiave: %s, Risposta: %s", keyword, response)
                         
 
-                        os.system("aplay " + self.path_wavs + response + ".wav")
+                        os.system("aplay " + os.path.join(self.current_dir,self.path_wavs) + response + ".wav")
                         print("continuo...")
 
                         # Riproduci la risposta dall'altoparlante
@@ -103,7 +105,15 @@ class SpeechRecognizer:
         
         self.listen_microphone()
         
-      
+    def say_something(self, text):
+        tts = gTTS(text=text, lang='it')
+        tts.save("response.mp3")
+        
+        subprocess.call(['ffmpeg', '-i', "response.mp3", "response.wav"])
+        
+        os.system("aplay response.wav")
+        os.system("rm response.wav")
+        os.system("rm response.mp3")
 
 if __name__ == '__main__':
     try:
