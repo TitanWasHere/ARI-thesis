@@ -25,7 +25,7 @@ To setup and start working with ARI you need to follow these steps:
 >###### Set the IP of the computer
 >Remember to set the IP of the computer to the one of the docker. In this case the IP is:
 >```bash
->export ROS_IP=10.196.192.3
+>export ROS_IP=<your IP address>
 >```
 
 >###### Run Rviz for ARI
