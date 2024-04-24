@@ -48,12 +48,12 @@ class SpeechRecognizer:
 
     def listen_microphone(self):
         while self.continue_listen is True:
-            rospy.loginfo("In ascolto... Parla pure!")
+            print("[INFO]: In ascolto... Parla pure!")
             with sr.Microphone() as source:
                 self.recognizer.adjust_for_ambient_noise(source)
                 audio = self.recognizer.listen(source)
 
-            rospy.loginfo("Riconoscimento in corso...")
+            print("[INFO]: Riconoscimento in corso...")
             try:
                 spoken_text = self.recognizer.recognize_google(audio, language='it-IT').lower()
                 print("Hai detto: " + spoken_text)
@@ -89,7 +89,7 @@ class SpeechRecognizer:
                                     
                                         
                             
-                                rospy.loginfo("Trovata parola chiave: %s, Risposta: %s", keyword, response)
+                                print("[INFO]: Trovata parola chiave: %s, Risposta: %s", keyword, response)
                             
 
                             os.system("aplay " + self.path_wavs + response + ".wav")
@@ -100,11 +100,11 @@ class SpeechRecognizer:
                             #os.system('echo ' + response)
                             
 
-                rospy.loginfo("Nessuna corrispondenza trovata.")
+                print("[INFO]: Nessuna corrispondenza trovata.")
             except sr.UnknownValueError:
-                rospy.loginfo("testo non riconosciuto")
+                print("[INFO]: testo non riconosciuto")
             except sr.RequestError as e:
-                rospy.loginfo("errore durante la richiesta a Google")
+                print("[INFO]: errore durante la richiesta a Google")
         
             self.listen_microphone()
         

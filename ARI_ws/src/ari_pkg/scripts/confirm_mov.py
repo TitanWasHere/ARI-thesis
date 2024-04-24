@@ -31,21 +31,37 @@ class checkMovement:
 
 
     def callback(self, data):
-        rospy.loginfo("Received: " + data.data)
+        print("[INFO]: Received: " + data.data)
         spoken_text = data.data
 
         # Check if the spoken text contains a POI (in the json)
         current_dir = os.path.dirname(os.path.abspath(__file__))
+        # Json structure:
+        # {
+        #     "POI_name": {
+        #       "wav_name": name,  
+        #       "spoken_name": nome a voce,
+        #       "keywords": ["keyword1", "keyword2", "keyword3"]
+        #     }
+        # }
         with open(os.path.join(current_dir, 'points_of_interest.json'), 'r') as file:
             self.poi = json.load(file)
 
         poi_name = None
-        rospy.loginfo("poi detected in map: " + str(self.poi))
+        print("[INFO]: poi detected in map: " + str(self.poi))
         detected_POI = []
         found = False
+        # for name, poilist in self.poi.items():
+        #     found = False
+        #     for keyword in poilist:
+        #         if not found and keyword.lower() in spoken_text.lower():
+        #             poi_name = name
+        #             found = True
+        #             detected_POI.append(poi_name)
+
         for name, poilist in self.poi.items():
             found = False
-            for keyword in poilist:
+            for keyword in poilist["keywords"]:
                 if not found and keyword.lower() in spoken_text.lower():
                     poi_name = name
                     found = True
@@ -54,11 +70,11 @@ class checkMovement:
         response = False
 
         if len(detected_POI) == 0:
-            rospy.logwarn("No POI not found")
+            rospy.logwarn("No POI found")
             self.pub_status.publish("not_found")
             return
         else:
-            rospy.loginfo("POI found: " + str(detected_POI))
+            print("[INFO]: POI found: " + str(detected_POI))
             response = self.confirm_POI(detected_POI)
 
         if response is False:
@@ -69,13 +85,13 @@ class checkMovement:
         
 
         # if self.check_POI(poi_name) is not None:
-        #     rospy.loginfo("["+poi_name+"] found")
+        #     print("[INFO]: ["+poi_name+"] found")
         #     self.gotoPOI(poi_name)
         # else:
-        #     rospy.loginfo("["+poi_name+"] not found")
+        #     print("[INFO]: ["+poi_name+"] not found")
 
     def confirm_POI(self, POIs):
-        rospy.loginfo("Point to check: " + str(POIs[0]))
+        print("[INFO]: Point to check: " + str(POIs[0]))
         self.say_something("Confermi di voler andare a " + POIs[0] + "? Dimmi si o no")
         response = self.wait_confirm()
         if response is False and len(POIs) > 1:
@@ -91,23 +107,6 @@ class checkMovement:
         else:
             return POIs[0]
     
-        
-        # if response is False:
-        #     self.pub_status.publish("not_found")
-        # else:
-        #     if self.check_POI(response) is not None:
-        #         rospy.loginfo("["+response+"] found")
-        #         self.gotoPOI(response)
-        #     else:
-        #         rospy.loginfo("["+response+"] not found")
-        #         self.pub_status.publish("not_found")
-
-        #         tts = gTTS(text="Mi dispiace, il punto non esiste nella mappa", lang='it')
-        #         tts.save("not_found.wav")
-        #         os.system("aplay not_found.wav")
-        #         os.system("rm not_found.wav")
-
-
     def goto_POI(self, name):
 
         self.say_something("Sto andando a " + name)
@@ -155,15 +154,26 @@ class checkMovement:
                     return False
             
 
-    def say_something(self, text):
-        tts = gTTS(text=text, lang='it')
-        tts.save("response.mp3")
-        
-        subprocess.call(['ffmpeg', '-i', "response.mp3", "response.wav"])
-        
-        os.system("aplay response.wav")
-        os.system("rm response.wav")
-        os.system("rm response.mp3")
+    # The text should anyway be written because if for any reason the wav file is not found, the robot will say the text anyway
+    def say_something(self, text, fileName=None):
+        if fileName is None or self.checkExistance(fileName) is False :
+            tts = gTTS(text=text, lang='it')
+            tts.save("response.mp3")
+                
+            subprocess.call(['ffmpeg', '-i', "response.mp3", "response.wav"])
+                
+            os.system("aplay response.wav")
+            os.system("rm response.wav")
+            os.system("rm response.mp3")
+
+
+    def checkExistance(self, fileName):
+        name = os.path.join(self.current_dir,self.path_wavs) + fileName + ".wav"
+        if os.path.exists(name):
+            os.system("aplay " + name)
+            return True
+        else:
+            return False
         
 if __name__ == '__main__':
     try:

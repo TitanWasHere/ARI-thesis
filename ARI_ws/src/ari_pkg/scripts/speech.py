@@ -30,8 +30,8 @@ class SpeechRecognizer:
         with open(os.path.join(self.current_dir,'responses.json'), 'r') as file:
             self.responses = json.load(file)
             
-            for r in self.responses:
-                self.resp_cycle[r] = [len(self.responses[r]), 0]
+            for topicName, data in self.responses.items():
+                self.resp_cycle[topicName] = [len(data["fileName"]), 0]
 
         # Inizializza il recognizer di speech_recognition
         self.recognizer = sr.Recognizer()
@@ -42,78 +42,92 @@ class SpeechRecognizer:
 
 
     def listen_microphone(self):
-        rospy.loginfo("In ascolto... Parla pure!")
+        print("[INFO]: In ascolto... Parla pure!")
         with sr.Microphone() as source:
             self.recognizer.adjust_for_ambient_noise(source)
             audio = self.recognizer.listen(source)
 
-        rospy.loginfo("Riconoscimento in corso...")
+        print("[INFO]: Riconoscimento in corso...")
         try:
             spoken_text = self.recognizer.recognize_google(audio, language='it-IT').lower()
             print("Hai detto: " + spoken_text)
+            found_something = False
             for topic, keywords in self.topics.items():
                 for keyword in keywords:
                     if keyword.lower() in spoken_text:
-                        # IN CASO IL TOPIC SIA "ARRIVEDERCI" ESCI DAL PROGRAMMA
-                        if topic is "addio":
+                        
+                        if topic == "addio":
                             continue_listen = False
                             response = "addio"
-                            os.system("aplay " + os.path.join(self.current_dir,self.path_wavs) + response + ".wav")
+                            #os.system("aplay " + os.path.join(self.current_dir,self.path_wavs) + response + ".wav")
+                            self.say_something(response, response)
                             exit()
-                        # Altrimenti puo' essere un topic di tipo solo speech oppure anche di movimento
-                        else:
-                                
-                            response = self.responses.get(topic, "No")
-                            print(response)
-                            if response is not "No":
-                                response = response[self.resp_cycle[topic][1]]
-                                self.resp_cycle[topic][1] = (self.resp_cycle[topic][1]+1)%(self.resp_cycle[topic][0])
-                                if topic == "goto":
-                                    self.check_goto.publish(String(spoken_text))
-                                    # res accepted:
-                                    # "ok" : all done successfully
-                                    # "not_found" : no POI found 
-                                    # "error" : something went wrong --> TODO make a wav for this 
-                                    # TODO: make a directory only for the responses of the movement (wavs)
-                                    try:
-                                        res = rospy.wait_for_message('/POI/move/status', String, timeout=None)
-                                        print(res)
-                                        if res.data == "not_found":
-                                            response = "no_POI"
-                                    except rospy.ROSException:
-                                        # TODO play wav for the unknown error
-                                        res = "error"
-                                        rospy.logerr("Timeout reached")
-                                        self.say_something("Errore, non ho stato trovato niente, prova a ripetere")
+                        # If it's a normal spoken response
+                        elif topic != "goto":
+                            # Responses json structure:
+                            # {
+                            # "topic": {
+                            #   "fileName": ["response1", "response2", "response3"],
+                            #   "text_if_error": "text in case the file is not found"
+                            #   }
+                            # }
 
-                            if response is not "error":
-                                rospy.loginfo("Trovata parola chiave: %s, Risposta: %s", keyword, response)
+
+                            response = self.responses[topic]
+                            response = response[self.resp_cycle[topic][1]]
+                            self.resp_cycle[topic][1] = (self.resp_cycle[topic][1]+1)%(self.resp_cycle[topic][0])
+                            print("[INFO]: Trovata parola chiave: %s, Risposta: %s", keyword, response)
+
+                            self.say_something(response, response)
                         
+                        else:
+                            try:
+                                res = rospy.wait_for_message('/POI/move/status', String, timeout=None)
+                                print(res)
+                                if res.data == "not_found":
+                                    response = "no_POI"
+                            except rospy.ROSException:
+                                res = "error"
+                                rospy.logerr("Timeout reached")
+                                self.say_something("Errore, non ho stato trovato niente, prova a ripetere")
+                                
+                        found_something = True
+                
+                if found_something:
+                    break
 
-                        os.system("aplay " + os.path.join(self.current_dir,self.path_wavs) + response + ".wav")
-                        print("continuo...")
+            print("[INFO]: continuo...")                    
 
-                        # Riproduci la risposta dall'altoparlante
-                        #os.system('echo ' + response)
-                            
-
-            rospy.loginfo("Nessuna corrispondenza trovata.")
+            #print("[INFO]: Nessuna corrispondenza trovata.")
         except sr.UnknownValueError:
-            rospy.loginfo("testo non riconosciuto")
+            rospy.logwarn("testo non riconosciuto")
         except sr.RequestError as e:
-            rospy.loginfo("errore durante la richiesta a Google")
+            rospy.logerr("errore durante la richiesta a Google")
         
         self.listen_microphone()
         
-    def say_something(self, text):
-        tts = gTTS(text=text, lang='it')
-        tts.save("response.mp3")
-        
-        subprocess.call(['ffmpeg', '-i', "response.mp3", "response.wav"])
-        
-        os.system("aplay response.wav")
-        os.system("rm response.wav")
-        os.system("rm response.mp3")
+    # The text should anyway be written because if for any reason the wav file is not found, the robot will say the text anyway
+    def say_something(self, text, fileName=None):
+        if fileName is None or self.checkExistance(fileName) is False :
+            tts = gTTS(text=text, lang='it')
+            tts.save("response.mp3")
+                
+            subprocess.call(['ffmpeg', '-i', "response.mp3", "response.wav"])
+                
+            os.system("aplay response.wav")
+            os.system("rm response.wav")
+            os.system("rm response.mp3")
+
+
+    def checkExistance(self, fileName):
+        name = os.path.join(self.current_dir,self.path_wavs) + fileName + ".wav"
+        if os.path.exists(name):
+            os.system("aplay " + name)
+            return True
+        else:
+            return False
+
+
 
 if __name__ == '__main__':
     try:
