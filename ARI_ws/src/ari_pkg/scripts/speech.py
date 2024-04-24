@@ -25,7 +25,14 @@ class SpeechRecognizer:
         self.current_dir = os.path.dirname(os.path.abspath(__file__))
         with open(os.path.join(self.current_dir,'topics.json'), 'r') as file:
             self.topics = json.load(file)
-            
+        
+
+        # {
+        #     "topic_name": {
+        #         "fileName": ["name1", "name2", "name3],
+        #         "text_if_error": "...text..."
+        #     }
+        # }
         # Carica il file JSON con le risposte
         with open(os.path.join(self.current_dir,'responses.json'), 'r') as file:
             self.responses = json.load(file)
@@ -73,7 +80,7 @@ class SpeechRecognizer:
                             # }
 
 
-                            response = self.responses[topic]
+                            response = self.responses[topic]["fileName"]
                             response = response[self.resp_cycle[topic][1]]
                             self.resp_cycle[topic][1] = (self.resp_cycle[topic][1]+1)%(self.resp_cycle[topic][0])
                             print("[INFO]: Trovata parola chiave: %s, Risposta: %s", keyword, response)
@@ -82,6 +89,7 @@ class SpeechRecognizer:
                         
                         else:
                             try:
+                                self.check_goto.publish(spoken_text)
                                 res = rospy.wait_for_message('/POI/move/status', String, timeout=None)
                                 print(res)
                                 if res.data == "not_found":
@@ -89,7 +97,7 @@ class SpeechRecognizer:
                             except rospy.ROSException:
                                 res = "error"
                                 rospy.logerr("Timeout reached")
-                                self.say_something("Errore, non ho stato trovato niente, prova a ripetere")
+                                self.say_something("Errore, non ho stato trovato niente, prova a ripetere", "no_POI")
                                 
                         found_something = True
                 
@@ -106,22 +114,29 @@ class SpeechRecognizer:
         
         self.listen_microphone()
         
-    # The text should anyway be written because if for any reason the wav file is not found, the robot will say the text anyway
     def say_something(self, text, fileName=None):
+        
         if fileName is None or self.checkExistance(fileName) is False :
+            if fileName is None:
+                fileName = "response"
+            print("[INFO]: Dico qualcosa con nome del file " + fileName)
             tts = gTTS(text=text, lang='it')
-            tts.save("response.mp3")
-                
-            subprocess.call(['ffmpeg', '-i', "response.mp3", "response.wav"])
-                
-            os.system("aplay response.wav")
-            os.system("rm response.wav")
-            os.system("rm response.mp3")
+            
+            newName = os.path.join(self.current_dir,self.path_wavs) + fileName
+            tts.save(newName + ".mp3")
+            subprocess.call(['ffmpeg', '-i',  newName+".mp3", newName+".wav"])
+
+            os.system("aplay" + newName + ".wav")
+            
+            if fileName == "response":
+                os.system("rm" + newName + ".wav")
+                os.system("rm" + newName + ".mp3")
 
 
     def checkExistance(self, fileName):
+        print("[INFO]: Dico qualcosa con nome del file " + fileName)
         name = os.path.join(self.current_dir,self.path_wavs) + fileName + ".wav"
-        if os.path.exists(name):
+        if os.path.isfile(name):
             os.system("aplay " + name)
             return True
         else:

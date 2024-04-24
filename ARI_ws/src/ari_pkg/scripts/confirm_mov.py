@@ -2,6 +2,7 @@
 import rospy
 import os
 from collections import deque
+import time
 import json
 import speech_recognition as sr
 from std_msgs.msg import String, Float64MultiArray
@@ -18,7 +19,8 @@ class checkMovement:
         self.sub_speech = rospy.Subscriber('/POI/move/check', String, self.callback)
         self.pub_status = rospy.Publisher('/POI/move/status', String, queue_size=2)
         self.firstFound = ""
-
+        self.current_dir = os.path.dirname(os.path.abspath(__file__))
+        self.path_wavs = "../wavs/andre/"
         self.allMarkers = {}
 
         self.recognizer = sr.Recognizer()
@@ -49,7 +51,7 @@ class checkMovement:
             self.poi = json.load(file)
 
         poi_name = None
-        print("[INFO]: poi detected in map: " + str(self.poi))
+        #print("[INFO]: poi detected in map: " + str(self.poi))
         detected_POI = {}
 
         found = False
@@ -153,27 +155,39 @@ class checkMovement:
                     return False
             
 
-    # The text should anyway be written because if for any reason the wav file is not found, the robot will say the text anyway
     def say_something(self, text, fileName=None):
+        
         if fileName is None or self.checkExistance(fileName) is False :
             if fileName is None:
                 fileName = "response"
-
+            print("[INFO]: Dico qualcosa con nome del file " + fileName)
+            
+            
             tts = gTTS(text=text, lang='it')
-            tts.save(fileName + ".mp3")
-                
-            subprocess.call(['ffmpeg', '-i', fileName+".mp3", fileName+".wav"])
+            #print("[TEST]: passato gTTS")
 
-            os.system("aplay" + fileName + ".wav")
+            newName = os.path.join(self.current_dir,self.path_wavs) + fileName 
+            #print("[TEST]: passato join")
+            
+            tts.save(newName + ".mp3")
+            #print("[TEST]: passato save")
+            
+            subprocess.call(['ffmpeg', '-i',  newName+".mp3", newName+".wav"])
+            #print("[TEST]: passato ffmpeg")
+            time.sleep(1)
+
+            os.system("aplay" + newName + ".wav")
+            #print("[TEST]: passato aplay")
             
             if fileName == "response":
-                os.system("rm" + fileName + ".wav")
-                os.system("rm" + fileName + ".mp3")
+                os.system("rm" + newName + ".wav")
+                os.system("rm" + newName + ".mp3")
 
 
     def checkExistance(self, fileName):
+        print("[INFO]: Dico qualcosa con nome del file " + str(fileName))
         name = os.path.join(self.current_dir,self.path_wavs) + fileName + ".wav"
-        if os.path.exists(name):
+        if os.path.isfile(name):
             os.system("aplay " + name)
             return True
         else:
