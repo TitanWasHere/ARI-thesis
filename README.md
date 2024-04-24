@@ -9,12 +9,12 @@ To setup and start working with ARI you need to follow these steps:
 2. Source the main files external the workspace
 >###### Ros setup
 >```bash
->source ~/../../opt/ros/melodic/setup.bash
+>source /opt/ros/melodic/setup.bash
 >```
 
 >###### Pal setup
 >```bash
->source ~/../../opt/pal/ferrum/setup.bash
+>source /opt/pal/ferrum/setup.bash
 >```
 
 >###### Connect to ARI 16-c
