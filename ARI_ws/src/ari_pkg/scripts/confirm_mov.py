@@ -17,6 +17,7 @@ class checkMovement:
         self.goal = rospy.Publisher('/poi_navigation_server/go_to_poi/goal', GoToPOIActionGoal, queue_size=2)
         self.sub_speech = rospy.Subscriber('/POI/move/check', String, self.callback)
         self.pub_status = rospy.Publisher('/POI/move/status', String, queue_size=2)
+        self.firstFound = ""
 
         self.allMarkers = {}
 
@@ -49,15 +50,9 @@ class checkMovement:
 
         poi_name = None
         print("[INFO]: poi detected in map: " + str(self.poi))
-        detected_POI = []
+        detected_POI = {}
+
         found = False
-        # for name, poilist in self.poi.items():
-        #     found = False
-        #     for keyword in poilist:
-        #         if not found and keyword.lower() in spoken_text.lower():
-        #             poi_name = name
-        #             found = True
-        #             detected_POI.append(poi_name)
 
         for name, poilist in self.poi.items():
             found = False
@@ -65,7 +60,9 @@ class checkMovement:
                 if not found and keyword.lower() in spoken_text.lower():
                     poi_name = name
                     found = True
-                    detected_POI.append(poi_name)
+                    detected_POI[poi_name] = self.poi[poi_name]["spoken_name"]
+                    if self.firstFound == "":
+                        self.firstFound = poi_name
 
         response = False
 
@@ -82,34 +79,32 @@ class checkMovement:
         else:
             self.goto_POI(response)
 
-        
 
-        # if self.check_POI(poi_name) is not None:
-        #     print("[INFO]: ["+poi_name+"] found")
-        #     self.gotoPOI(poi_name)
-        # else:
-        #     print("[INFO]: ["+poi_name+"] not found")
+    
 
     def confirm_POI(self, POIs):
-        print("[INFO]: Point to check: " + str(POIs[0]))
-        self.say_something("Confermi di voler andare a " + POIs[0] + "? Dimmi si o no")
+        print("[INFO]: Point to check: " + str(POIs[self.firstFound]))
+        self.say_something("Confermi di voler andare a " + POIs[self.firstFound] + "? Dimmi si o no", "confirm_"+self.firstFound)
         response = self.wait_confirm()
-        if response is False and len(POIs) > 1:
-            # In caso non va bene, salvo in una stringa tutti gli altri POI trovati
-            del POIs[0]
-            others = ""
-            for poi in POIs:
-                others += poi + " "
+        if response is False:
+            if len(POIs) > 1:
+                # In caso non va bene, salvo in una stringa tutti gli altri POI trovati
+                del POIs[self.firstFound]
+                others = ""
+                for _ , poi_data in POIs.items():
+                    others += poi_data["spoken_name"] + ", "
 
-            self.say_something("Dimmi se intedevi uno dei seguenti punti, altrimenti dimmi nessuno: " + others)
+                self.say_something("Dimmi se intedevi uno dei seguenti punti, altrimenti dimmi nessuno: " + others)
 
-            return self.wait_confirm_for_more_POIs(POIs)
+                return self.wait_confirm_for_more_POIs(POIs)
+            else:
+                return False
         else:
-            return POIs[0]
+            return POIs[self.firstFound]
     
     def goto_POI(self, name):
 
-        self.say_something("Sto andando a " + name)
+        self.say_something("Sto andando a " + name , "goto_" + name)
         
         self.goal_msg = GoToPOIActionGoal()
         self.goal_msg.header.seq = 0
@@ -122,7 +117,9 @@ class checkMovement:
                         
 
     def wait_confirm_for_more_POIs(self, POIs):
+        count = 0
         while True:
+            
             with sr.Microphone() as source:
                 self.recognizer.adjust_for_ambient_noise(source)
                 audio = self.recognizer.listen(source)
@@ -130,17 +127,19 @@ class checkMovement:
             spoken_text = self.recognizer.recognize_google(audio, language='it-IT').lower()
             print("Hai detto: " + spoken_text)
             if spoken_text != "":
-                if "nessuno" in spoken_text.lower():
+                if "nessuno" in spoken_text:
                     return False
                 
-                for poi in POIs:
+                for poi in POIs.items():
                     if poi.lower() in spoken_text:
                         return poi
                 
-
+                if count == 5:
+                    count += 1
+                    self.say_something("Non ho capito. Ripeti per favore", "repeat")
+    
     def wait_confirm(self):
         while True:
-            # Parla al microfono e ritorna True se dice "si"
             with sr.Microphone() as source:
                 self.recognizer.adjust_for_ambient_noise(source)
                 audio = self.recognizer.listen(source)
@@ -157,14 +156,19 @@ class checkMovement:
     # The text should anyway be written because if for any reason the wav file is not found, the robot will say the text anyway
     def say_something(self, text, fileName=None):
         if fileName is None or self.checkExistance(fileName) is False :
+            if fileName is None:
+                fileName = "response"
+
             tts = gTTS(text=text, lang='it')
-            tts.save("response.mp3")
+            tts.save(fileName + ".mp3")
                 
-            subprocess.call(['ffmpeg', '-i', "response.mp3", "response.wav"])
-                
-            os.system("aplay response.wav")
-            os.system("rm response.wav")
-            os.system("rm response.mp3")
+            subprocess.call(['ffmpeg', '-i', fileName+".mp3", fileName+".wav"])
+
+            os.system("aplay" + fileName + ".wav")
+            
+            if fileName == "response":
+                os.system("rm" + fileName + ".wav")
+                os.system("rm" + fileName + ".mp3")
 
 
     def checkExistance(self, fileName):
