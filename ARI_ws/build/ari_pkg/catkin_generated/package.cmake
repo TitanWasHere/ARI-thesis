@@ -1,6 +1,6 @@
 set(_CATKIN_CURRENT_PACKAGE "ari_pkg")
 set(ari_pkg_VERSION "0.0.0")
-set(ari_pkg_MAINTAINER "root <root@todo.todo>")
+set(ari_pkg_MAINTAINER "andrea gravili <andrea.gravili@studenti.unitn.it>")
 set(ari_pkg_PACKAGE_FORMAT "2")
 set(ari_pkg_BUILD_DEPENDS "geometry_msgs" "pal_navigation_msgs" "roscpp" "rospy" "sensor_msgs" "std_msgs" "tf" "tf2")
 set(ari_pkg_BUILD_EXPORT_DEPENDS "geometry_msgs" "pal_navigation_msgs" "roscpp" "rospy" "sensor_msgs" "std_msgs" "tf" "tf2")

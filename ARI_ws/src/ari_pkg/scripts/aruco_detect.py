@@ -79,6 +79,9 @@ class detection:
 
 
     def transform_callback(self, msg):
+        # trans, rot = self.get_transform("odom", "torso_front_camera_color_frame")
+        # print("position: " ,  np.array([trans[0], trans[1], trans[2]]) , " | orientation: " , np.array([rot[3], rot[0], rot[1], rot[2]]))
+
         trans, rot = self.get_transform("base_footprint", "torso_front_camera_color_frame")
         self.baseFootprint_to_camera = {"position": np.array([trans[0], trans[1], trans[2]]) , "orientation": np.array([rot[3], rot[0], rot[1], rot[2]])} 
         trans, rot = self.get_transform("odom", "base_footprint")
@@ -164,7 +167,7 @@ class detection:
             frame = cv2.aruco.drawDetectedMarkers(frame, corners,ids)
             for i in range(len(ids)):
                 frame = cv2.aruco.drawAxis(frame, INTRINSIC_USED, DISTORTION_USED, rvec[i], tvec[i], 0.1)
-                print('[' + str(ids[i]) + ']: { tvec: ' + str(tvec[i][0]) + ' rvec: ' + str(rvec[i][0]) + ' }')
+                #print('[' + str(ids[i]) + ']: { tvec: ' + str(tvec[i][0]) + ' rvec: ' + str(rvec[i][0]) + ' }')
 
             #frame = cv2.aruco.drawAxis(frame, INTRINSIC_CAMERA, DISTORTION_CAMERA, rvec, tvec, 0.1)
             return frame, tvec, rvec, ids
@@ -188,7 +191,16 @@ class detection:
                         print(self.map_to_aruco)
                         sleep(1)
 
+                    aruco_in_camera = cv2.Rodrigues(rvec[i])[0]
+                    quat = Quaternion(matrix=aruco_in_camera)
+                    print(quat.norm)
+                    br = tf.TransformBroadcaster()
                     
+                    # torso_front_camera_color_frame
+                    # 
+                    # print('[' + str(ids[i]) + ']: { tvec: ' + str(tvec[i][0]) + ' rvec: ' + str(rvec[i][0]) + ' }')
+                    # print(quat)
+                    # br.sendTransform((tvec[i][0][0], tvec[i][0][1], tvec[i][0][2]), (quat[1], quat[2], quat[3], quat[0]), rospy.Time.now(), "aruco_aus", "torso_front_camera_color_frame")
 
                     #base_to_camera, base_to_odom, map_to_odom, map_to_aruco = self.get_tf2_positions()
                     camera_T_aruco = np.zeros((4,4))
@@ -254,8 +266,8 @@ class detection:
                     pose.pose.pose.orientation.z = quat_map_base[3]
                     pose.pose.pose.orientation.w = quat_map_base[0]
 
-                    self.pub_myPos.publish(pose)
-                    print("pose: " + str(pose))
+                    #self.pub_myPos.publish(pose)
+                    #print("pose: " + str(pose))
 
 
                 except KeyError:
