@@ -60,6 +60,7 @@ class detection:
         self.baseFootprint_to_camera = None
         self.map_to_aruco = None
         self.map_to_baseFootprint = None
+        self.odom_to_camera = None
 
 
         # self.goal = rospy.Publisher('/poi_navigation_server/go_to_poi/goal', GoToPOIActionGoal, queue_size=2)
@@ -76,11 +77,47 @@ class detection:
     #     self.goal_msg.goal_id.id = ''
     #     self.goal_msg.goal.poi.data = 'ari_16c_dockstation'
     #     self.goal.publish(self.goal_msg)
+    
+    def transform_prova(self):
+        trans, rot = self.get_transform("map", "odom")
+        self.map_to_odom = {"position": np.array([trans[0], trans[1], trans[2]]) , "orientation": np.array([rot[3], rot[0], rot[1], rot[2]])}
 
+        map_to_odom_quaternion = Quaternion(np.array([self.map_to_odom["orientation"][0], self.map_to_odom["orientation"][1], self.map_to_odom["orientation"][2], self.map_to_odom["orientation"][3]]))
+        mat = np.zeros((4,4))
+        mat[0:3, 0:3] = map_to_odom_quaternion.rotation_matrix
+        mat[0:3, 3] = np.array([self.map_to_odom["position"][0], self.map_to_odom["position"][1], self.map_to_odom["position"][2]])
+        mat[3, 3] = 1
+
+        print("[MAP_T_ODOM][ORIENTATION]: " + str(map_to_odom_quaternion[0]) + " " + str(map_to_odom_quaternion[1]) + " " + str(map_to_odom_quaternion[2]) + " " + str(map_to_odom_quaternion[3]))
+        print("[MAP_T_ODOM][POSITION]: " + str(mat[0:3, 3]))
+
+        trans, rot = self.get_transform("odom", "torso_front_camera_color_frame")
+        self.odom_to_camera = {"position": np.array([trans[0], trans[1], trans[2]]) , "orientation": np.array([rot[3], rot[0], rot[1], rot[2]])}
+        odom_to_camera_quaternion = Quaternion(np.array([self.odom_to_camera["orientation"][0], self.odom_to_camera["orientation"][1], self.odom_to_camera["orientation"][2], self.odom_to_camera["orientation"][3]]))
+        mat2 = np.zeros((4,4))
+        mat2[0:3, 0:3] = odom_to_camera_quaternion.rotation_matrix
+        mat2[0:3, 3] = np.array([self.odom_to_camera["position"][0], self.odom_to_camera["position"][1], self.odom_to_camera["position"][2]])
+        mat2[3, 3] = 1
+
+        # print("[ODOM_T_][ORIENTATION]: " + str(odom_to_camera_quaternion[0]) + " " + str(odom_to_camera_quaternion[1]) + " " + str(odom_to_camera_quaternion[2]) + " " + str(odom_to_camera_quaternion[3]))
+        # print("[POSITION]: " + str(mat2[0:3, 3]))
+
+        newMat = np.dot(mat, mat2)
+        #print("newMat: " + str(newMat))
+        quat = Quaternion(matrix=newMat[0:3, 0:3])
+        # print("quat: " + str(quat))
+        # print("position: " + str(newMat[0:3, 3]))
+
+        print("[ORIENTATION]: " + str(quat[0]) + " " + str(quat[1]) + " " + str(quat[2]) + " " + str(quat[3]))
+        print("[POSITION]: " + str(newMat[0:3, 3]))
 
     def transform_callback(self, msg):
-        # trans, rot = self.get_transform("odom", "torso_front_camera_color_frame")
-        # print("position: " ,  np.array([trans[0], trans[1], trans[2]]) , " | orientation: " , np.array([rot[3], rot[0], rot[1], rot[2]]))
+        # trans, rot = self.get_transform("map", "odom")
+        # print("[INFO]: position: " ,  np.array([trans[0], trans[1], trans[2]]) , " | orientation: " , np.array([rot[3], rot[0], rot[1], rot[2]]))
+        
+        self.transform_prova()
+
+
 
         trans, rot = self.get_transform("base_footprint", "torso_front_camera_color_frame")
         self.baseFootprint_to_camera = {"position": np.array([trans[0], trans[1], trans[2]]) , "orientation": np.array([rot[3], rot[0], rot[1], rot[2]])} 
@@ -246,6 +283,7 @@ class detection:
 
                     map_T_base = np.dot(map_T_aruco, aruco_T_base)
                     quat_map_base = Quaternion(matrix=map_T_base[0:3, 0:3])
+                    #print("map_T_base: " + str(map_T_base))
 
 
                     # ## PROVA ##
