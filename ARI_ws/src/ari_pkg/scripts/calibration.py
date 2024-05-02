@@ -26,17 +26,6 @@ from collections import namedtuple
 import geometry_msgs.msg
 from tf2_msgs.msg import TFMessage
 
-# rospy.init_node('tf_listener')
-# tfBuffer = tf2_ros.Buffer()
-# listener = tf2_ros.TransformListener(tfBuffer)
-
-# while not rospy.is_shutdown():
-#     try:
-#         print("prima del lookup")
-#         trans = tfBuffer.lookup_transform('map', 'torso_front_camera_color_frame', rospy.Time())
-#         print(trans)
-#     except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
-#         continue
 INTRINSIC_CAMERA_REALSENSE_1280 = np.array([[fx_RealSense_1280, 0, cx_RealSense_1280], [0, fy_RealSense_1280, cy_RealSense_1280], [0, 0, 1]])
 DISTORTION_CAMERA_REALSENSE_1280 = np.array([k1_RealSense_1280, k2_RealSense_1280, p1_RealSense_1280, p2_RealSense_1280, k3_RealSense_1280])
 
@@ -45,12 +34,19 @@ class calibration:
 
 
     def __init__(self):
+        
+
         self.pub_torso = rospy.Publisher('/torso_front_camera/color/aruco', Image, queue_size=2)
         self.pub_front = rospy.Publisher('/head_front_camera/color/aruco', Image, queue_size=2)
         self.pub_myPos = rospy.Publisher('/initialpose', PoseWithCovarianceStamped, queue_size=2)
         self.sub_torso = rospy.Subscriber('/torso_front_camera/color/image_raw', Image, self.image_callback, queue_size=2)
+        
         self.sub_front = rospy.Subscriber('/head_front_camera/color/image_raw/compressed', CompressedImage, self.image_compressed_callback, queue_size=2)
+        
+        
         #self.listener = tf.TransformListener()
+        
+        # Subscribing to /tf to get the transformation between the frames it's a big problem because the function is never called for some reason
         #self.sub_tf = rospy.Subscriber('/tf', TFMessage, self.transform_callback)
 
         
@@ -64,10 +60,13 @@ class calibration:
         self.map_to_odom = None
         self.odom_to_baseFootprint = None
         self.baseFootprint_to_camera = None
-        self.map_to_aruco = None
+        self.map_to_aruco = {}
         self.map_to_baseFootprint = None
         self.odom_to_camera = None
         self.map_to_camera = None
+        self.map_to_headCamera = None
+
+        
 
         
     def print_values(self, frame_x, frame_y, val):
@@ -90,10 +89,10 @@ class calibration:
 
         
 
-        print(msg)
-        print("transform_callback")
+        #print(msg)
+        #print("transform_callback")
         trans = self.get_transform("map", "odom")
-        print("after get_transform")
+        #print("after get_transform")
         self.map_to_odom = self.assign_values(trans)
         
 
@@ -103,9 +102,13 @@ class calibration:
 
         trans = self.get_transform("base_footprint", "torso_front_camera_color_optical_frame")
         self.baseFootprint_to_camera = self.assign_values(trans)
-
-        trans = self.get_transform("map", "aruco")
-        self.map_to_aruco = self.assign_values(trans)
+        
+        for key in ArUcos:
+            name = "aruco_" + key
+            trans = self.get_transform("map", name)
+            self.map_to_aruco[key] = self.assign_values(trans)
+        
+        
 
         trans = self.get_transform("map", "base_footprint")
         self.map_to_baseFootprint = self.assign_values(trans)
@@ -115,6 +118,9 @@ class calibration:
 
         trans = self.get_transform("map", "torso_front_camera_color_optical_frame")
         self.map_to_camera = self.assign_values(trans)
+
+        trans = self.get_transform("map", "head_front_camera_color_optical_frame")
+        self.map_to_headCamera = self.assign_values(trans)
 
 
         # self.print_values("map", "odom", self.map_to_odom)
@@ -127,12 +133,14 @@ class calibration:
 
         # print("^^^^^^^^^^^^^^^")
 
-
+        # for key in ArUcos:
+        #     self.print_values("map", "aruco_" + key, self.map_to_aruco[key])
 
 
 
 
     def assign_values(self, values):
+        # Assign the values to the namedtuple so we can get poses like "map_to_odom.position.x" for better readability
         var = namedtuple("Pose", ["position", "orientation"])
         position = namedtuple("Position", ["x", "y", "z"])
         orientation = namedtuple("Orientation", ["x", "y", "z", "w"])
@@ -166,6 +174,8 @@ class calibration:
 
         self.manage_frame(frame, tvec, rvec, ids, "torso" )
 
+
+    
     def image_compressed_callback(self, msg):
         image_wrp = np.asarray(bytearray(msg.data), dtype="uint8")
         image_wrp = cv2.imdecode(image_wrp, cv2.IMREAD_COLOR) 
@@ -213,61 +223,81 @@ class calibration:
             return frame, tvec, rvec, ids
         return frame, None, None, None
     
+    
     def manage_frame(self, frame, tvec, rvec, ids, type):
-
+        #self.publish_arucos_in_map()
         self.transform_callback(None)
-        print("after transform_callback ")
+        
+        #print("after transform_callback ")
         if ids is not None:
             for i in range(len(ids)):
                 try:
                     # aruco = ArUcos[str(ids[i])]
                     # sleep(2)
+                    arucoKey = "aruco_" + str(ids[i])
                     
-                    while self.map_to_odom is None or self.odom_to_baseFootprint is None or self.baseFootprint_to_camera is None or self.map_to_aruco is None :
+                    while self.map_to_odom is None or self.odom_to_baseFootprint is None or self.baseFootprint_to_camera is None or self.map_to_aruco[arucoKey] is None :
                         print('Waiting for tf...')
                         print(self.map_to_odom)
                         print(self.odom_to_baseFootprint)
                         print(self.baseFootprint_to_camera)
                         print(self.map_to_baseFootprint)
-                        print(self.map_to_aruco)
+                        print(self.map_to_aruco[arucoKey])
                         sleep(1)
                     
+                    if type == "front":
+                        cam = self.map_to_headCamera
+                    else:
+                        cam = self.map_to_camera
 
-                    map_camera_ori_quat = Quaternion(a = self.map_to_camera.orientation.w, b = self.map_to_camera.orientation.x, c = self.map_to_camera.orientation.y, d = self.map_to_camera.orientation.z)
-                    map_T_camera = np.zeros((4,4))
-                    map_T_camera[0:3, 0:3] = map_camera_ori_quat.rotation_matrix
-                    map_T_camera[0:3, 3] = np.array([self.map_to_camera.position.x, self.map_to_camera.position.y, self.map_to_camera.position.z])
-                    map_T_camera[3, 3] = 1
-
-                    camera_T_aruco = np.zeros((4,4))
-                    camera_T_aruco[0:3, 0:3] = cv2.Rodrigues(rvec[i])[0]
-                    camera_T_aruco[0:3, 3] = tvec[i][0]
-                    camera_T_aruco[3, 3] = 1
                     
-                    map_T_aruco = np.dot(map_T_camera, camera_T_aruco)
+                    # map_camera_ori_quat = Quaternion(a = cam.orientation.w, b = cam.orientation.x, c = cam.orientation.y, d = cam.orientation.z)
+                    # map_T_camera = np.zeros((4,4))
+                    # map_T_camera[0:3, 0:3] = map_camera_ori_quat.rotation_matrix
+                    # map_T_camera[0:3, 3] = np.array([cam.position.x, cam.position.y, cam.position.z])
+                    # map_T_camera[3, 3] = 1
 
-                    self.publish_tf2("map", "new_aruco", map_T_aruco)
+                    # camera_T_aruco = np.zeros((4,4))
+                    # camera_T_aruco[0:3, 0:3] = cv2.Rodrigues(rvec[i])[0]
+                    # camera_T_aruco[0:3, 3] = tvec[i][0]
+                    # camera_T_aruco[3, 3] = 1
+                    
+                    # map_T_arucoDetected = np.dot(map_T_camera, camera_T_aruco)
+
+                    # self.publish_tf2("map", "detected_aruco", map_T_arucoDetected)
 
 
-                    # # T1 * T2 = map_T_camera * camera_T_aruco
-                    # # T1 * T2 ^ -1 = map_T_camera * camera_T_aruco ^ -1
-                    # # T2 * T1 = camera_T_aruco * map_T_camera
-                    # # T2 ^ -1 * T1 = camera_T_aruco ^ -1 * map_T_camera
-                    # self.publish_tf2("map", "T1xT2_inv", np.dot(map_T_camera, np.linalg.inv(camera_T_aruco)))
-                    # self.publish_tf2("map", "T2xT1", np.dot(camera_T_aruco, map_T_camera))
-                    # self.publish_tf2("map", "T2_invxT1", np.dot(np.linalg.inv(camera_T_aruco), map_T_camera))
+                    # baseFootprint_T_camera = np.zeros((4,4))
+                    # baseFootprint_T_camera[0:3, 0:3] = Quaternion(a = self.baseFootprint_to_camera.orientation.w, b = self.baseFootprint_to_camera.orientation.x, c = self.baseFootprint_to_camera.orientation.y, d = self.baseFootprint_to_camera.orientation.z).rotation_matrix
+                    # baseFootprint_T_camera[0:3, 3] = np.array([self.baseFootprint_to_camera.position.x, self.baseFootprint_to_camera.position.y, self.baseFootprint_to_camera.position.z])
+                    # baseFootprint_T_camera[3, 3] = 1
 
-                    odom_camera_ori_quat = Quaternion(a = self.odom_to_camera.orientation.w, b = self.odom_to_camera.orientation.x, c = self.odom_to_camera.orientation.y, d = self.odom_to_camera.orientation.z)
-                    odom_T_camera = np.zeros((4,4))
-                    odom_T_camera[0:3, 0:3] = odom_camera_ori_quat.rotation_matrix
-                    odom_T_camera[0:3, 3] = np.array([self.odom_to_camera.position.x, self.odom_to_camera.position.y, self.odom_to_camera.position.z])
-                    odom_T_camera[3, 3] = 1
+                    # baseFootprint_T_aruco = np.dot(baseFootprint_T_camera, camera_T_aruco)
 
-                    odom_T_aruco = np.dot(odom_T_camera, camera_T_aruco)
+                    # aruco_T_baseFootprint = np.linalg.inv(baseFootprint_T_aruco)
 
-                    self.publish_tf2("odom", "odom->cam->aruco", odom_T_aruco)
+                    # map_T_aruco = np.zeros((4,4))
+                    # map_T_aruco[0:3, 0:3] = Quaternion(a = self.map_to_aruco[arucoKey].orientation.w, b = self.map_to_aruco[arucoKey].orientation.x, c = self.map_to_aruco[arucoKey].orientation.y, d = self.map_to_aruco[arucoKey].orientation.z).rotation_matrix
+                    # map_T_aruco[0:3, 3] = np.array([self.map_to_aruco[arucoKey].position.x, self.map_to_aruco[arucoKey].position.y, self.map_to_aruco[arucoKey].position.z])
+                    # map_T_aruco[3, 3] = 1
 
-                    print("after while")
+                    # map_T_baseFootprint = np.dot(map_T_aruco, aruco_T_baseFootprint)
+                    # quat_map_base = Quaternion(matrix=map_T_baseFootprint[:3, :3])
+                    # self.publish_tf2("map", "new_base", map_T_baseFootprint)
+
+
+                    # pose = PoseWithCovarianceStamped()
+                    # pose.header = Header()
+                    # pose.header.stamp = rospy.Time.now()
+                    # pose.header.frame_id = "map"
+                    # pose.pose.pose.position.x = map_T_baseFootprint[0, 3]
+                    # pose.pose.pose.position.y = map_T_baseFootprint[1, 3]
+                    # pose.pose.pose.position.z =  0 #map_T_baseFootprint[2, 3]
+                    # pose.pose.pose.orientation.x = quat_map_base[1]
+                    # pose.pose.pose.orientation.y = quat_map_base[2]
+                    # pose.pose.pose.orientation.z = quat_map_base[3]
+                    # pose.pose.pose.orientation.w = quat_map_base[0]
+                    #self.pub_myPos.publish(pose)
 
                     
 
@@ -298,7 +328,9 @@ class calibration:
             t.transform.rotation.y = q.y
             t.transform.rotation.z = q.z
             t.transform.rotation.w = q.w
+            print(t)
             br.sendTransform(t)
+            print("pubblicato")
 
 
 def main():

@@ -7,5 +7,7 @@
     <!--<node pkg="ari_pkg" type="fixed_tf_broadcaster.py" name="broadcaster_fixed" />-->
     <node name="detect_aruco" type="calibration.py" pkg="ari_pkg" output="screen" />
     <!--<node name="move_to_poi" type="move_to_POI.py" pkg="ari_pkg" output="screen" />-->
-    <node pkg="tf2_ros" type="static_transform_publisher" name="link1_broadcaster" args="127.83719635 59.4459762573 0.0 0.0 0.0 0.0 1.0 map aruco" />
+    <!--<node pkg="tf2_ros" type="static_transform_publisher" name="link1_broadcaster" args="127.83719635 59.4459762573 0.0 0.0 0.0 0.0 1.0 map aruco_7" />-->
+
+    <node name="publish_frame" type="publish_frames.py" pkg="ari_pkg" output="screen" />
 </launch>
