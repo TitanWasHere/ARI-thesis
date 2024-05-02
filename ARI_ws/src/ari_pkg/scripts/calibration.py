@@ -4,12 +4,9 @@ import rospy
 import cv2
 from cv2 import aruco
 import numpy as np
-from sensor_msgs.msg import Image
-from sensor_msgs.msg import CompressedImage
+from sensor_msgs.msg import Image, CompressedImage
 from cv_bridge import CvBridge
-from geometry_msgs.msg import PoseStamped
-from geometry_msgs.msg import PoseWithCovarianceStamped
-from geometry_msgs.msg import Pose
+from geometry_msgs.msg import PoseWithCovarianceStamped, Pose, PoseStamped
 from std_msgs.msg import Header
 import copy
 #from pal_navigation_msgs.msg import GoToPOIActionGoal
