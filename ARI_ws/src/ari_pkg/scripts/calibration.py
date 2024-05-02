@@ -43,6 +43,7 @@ class calibration:
         
         self.sub_front = rospy.Subscriber('/head_front_camera/color/image_raw/compressed', CompressedImage, self.image_compressed_callback, queue_size=2)
         
+        self.sub_transform = rospy.Subscriber("/transform", TFMessage, self.transform_callback)
         
         #self.listener = tf.TransformListener()
         
@@ -86,56 +87,27 @@ class calibration:
 
 
     def transform_callback(self, msg):
+        myTransforms = []
+        for transforms in msg.transforms:
+            myTransforms.append(transforms)
 
-        
+        self.map_to_odom = self.assign_values(myTransforms[0])
+        self.odom_to_baseFootprint = self.assign_values(myTransforms[1])
+        self.baseFootprint_to_camera = self.assign_values(myTransforms[2])
+        self.map_to_baseFootprint = self.assign_values(myTransforms[3])
+        self.odom_to_camera = self.assign_values(myTransforms[4])
+        self.map_to_camera = self.assign_values(myTransforms[5])
+        self.map_to_headCamera = self.assign_values(myTransforms[6])
 
-        #print(msg)
-        #print("transform_callback")
-        trans = self.get_transform("map", "odom")
-        #print("after get_transform")
-        self.map_to_odom = self.assign_values(trans)
-        
 
-        trans = self.get_transform("odom", "base_footprint")
-        self.odom_to_baseFootprint = self.assign_values(trans)
-        
 
-        trans = self.get_transform("base_footprint", "torso_front_camera_color_optical_frame")
-        self.baseFootprint_to_camera = self.assign_values(trans)
-        
+        i = 0
         for key in ArUcos:
             name = "aruco_" + key
-            trans = self.get_transform("map", name)
-            self.map_to_aruco[key] = self.assign_values(trans)
-        
-        
-
-        trans = self.get_transform("map", "base_footprint")
-        self.map_to_baseFootprint = self.assign_values(trans)
-
-        trans = self.get_transform("odom", "torso_front_camera_color_optical_frame")
-        self.odom_to_camera = self.assign_values(trans)
-
-        trans = self.get_transform("map", "torso_front_camera_color_optical_frame")
-        self.map_to_camera = self.assign_values(trans)
-
-        trans = self.get_transform("map", "head_front_camera_color_optical_frame")
-        self.map_to_headCamera = self.assign_values(trans)
-
-
-        # self.print_values("map", "odom", self.map_to_odom)
-        # self.print_values("odom", "base_footprint", self.odom_to_baseFootprint)
-        # self.print_values("base_footprint", "torso_front_camera_color_frame", self.baseFootprint_to_camera)
-        # self.print_values("map", "aruco", self.map_to_aruco)
-        # self.print_values("map", "base_footprint", self.map_to_baseFootprint)
-        # self.print_values("odom", "torso_front_camera_color_frame", self.odom_to_camera)
-        #self.print_values("map", "torso_front_camera_color_frame", self.map_to_camera)
-
-        # print("^^^^^^^^^^^^^^^")
-
-        # for key in ArUcos:
-        #     self.print_values("map", "aruco_" + key, self.map_to_aruco[key])
-
+            self.map_to_aruco[name] = self.assign_values(myTransforms[7 + i])
+            i+=1
+            #print("[" + name + "]: " + str(self.map_to_aruco[name]))
+            self.print_values("map", name, self.map_to_aruco[name])
 
 
 
@@ -148,20 +120,7 @@ class calibration:
         ori = orientation(values.transform.rotation.x, values.transform.rotation.y, values.transform.rotation.z, values.transform.rotation.w)
         return var(pos, ori)
         
-    def get_transform(self, frame_x, frame_y, ok = False):
-        
 
-        trans = None
-        while not rospy.is_shutdown() and not ok:
-            try:
-                #print("Prima di " + frame_x + " su " + frame_y)
-                trans = self.tfBuffer.lookup_transform(frame_x, frame_y, rospy.Time())
-                #print(trans)
-                ok = True    
-            except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
-                continue
-        
-        return trans
 
     def image_callback(self, msg):
         #bridge = CvBridge()
@@ -226,7 +185,6 @@ class calibration:
     
     def manage_frame(self, frame, tvec, rvec, ids, type):
         #self.publish_arucos_in_map()
-        self.transform_callback(None)
         
         #print("after transform_callback ")
         if ids is not None:
@@ -238,11 +196,11 @@ class calibration:
                     
                     while self.map_to_odom is None or self.odom_to_baseFootprint is None or self.baseFootprint_to_camera is None or self.map_to_aruco[arucoKey] is None :
                         print('Waiting for tf...')
-                        print(self.map_to_odom)
-                        print(self.odom_to_baseFootprint)
-                        print(self.baseFootprint_to_camera)
-                        print(self.map_to_baseFootprint)
-                        print(self.map_to_aruco[arucoKey])
+                        # print(self.map_to_odom)
+                        # print(self.odom_to_baseFootprint)
+                        # print(self.baseFootprint_to_camera)
+                        # print(self.map_to_baseFootprint)
+                        # print(self.map_to_aruco[arucoKey])
                         sleep(1)
                     
                     if type == "front":

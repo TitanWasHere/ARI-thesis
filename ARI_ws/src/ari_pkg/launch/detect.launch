@@ -10,4 +10,5 @@
     <!--<node pkg="tf2_ros" type="static_transform_publisher" name="link1_broadcaster" args="127.83719635 59.4459762573 0.0 0.0 0.0 0.0 1.0 map aruco_7" />-->
 
     <node name="publish_frame" type="publish_frames.py" pkg="ari_pkg" output="screen" />
+    <node name="publish_transformation" type="transformations.py" pkg="ari_pkg" output="screen" />
 </launch>
