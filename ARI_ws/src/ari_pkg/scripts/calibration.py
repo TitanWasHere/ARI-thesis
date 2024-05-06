@@ -11,6 +11,7 @@ from std_msgs.msg import Header
 import copy
 #from pal_navigation_msgs.msg import GoToPOIActionGoal
 from time import sleep
+import time
 from pyquaternion import Quaternion
 from std_msgs.msg import String
 from ArUco_data import *
@@ -168,8 +169,16 @@ class calibration:
 
     def get_pose(self, frame, width=848):
         
-        if self.needToStop and rospy.Time.now() - self.last_time < rospy.Duration(self.timeToPassSinceStopped):
-            return frame, None, None, None
+        # DECOMMENT THE BLOCK BELOW TO CONTINUE WITH THE BLOCKING OF THE ROBOT WHEN THE ARUCO IS DETECTED
+        # print("[NOW]: " + str((int)(time.time())))
+        # print("[LAST]: " + str(self.last_time_seen_aruco))
+        # #print(rospy.Duration(self.timeToPassSinceStopped))
+        
+        # print("Is time now - last < timeToPassSinceStopped? " + str((int)(time.time()) - self.last_time_seen_aruco < self.timeToPassSinceStopped))
+
+        # if self.needToStop and (int)(time.time()) - self.last_time_seen_aruco < self.timeToPassSinceStopped:
+        #     print("[INFO]: Stopping for " + str((int)(time.time()) - self.last_time_seen_aruco) + " seconds")
+        #     return frame, None, None, None
 
         #cv2.imshow('image', frame)
         #cv2.waitKey(1)
@@ -218,7 +227,7 @@ class calibration:
         if ids is not None:
 
             for i in range(len(ids)):
-                
+                # DECOMMENT THE BLOCK BELOW TO CONTINUE WITH THE BLOCKING OF THE ROBOT WHEN THE ARUCO IS DETECTED
                 # if self.last_seen_aruco != ids[i] or rospy.Time.now() - self.last_time > self.time_to_pass_since_last:
                 #     self.last_velocity = self.velocity
                 #     stop_velocity = self.velocity_to_zero()
@@ -234,15 +243,7 @@ class calibration:
                 #         self.last_time = rospy.Time.now()
                 #         self.last_seen_aruco = ids[i]
                     
-                if not self.needToStop:
-                    if self.last_seen_aruco != ids[i] or rospy.Time.now() - self.last_time > rospy.Duration(self.time_to_pass_since_last):
-                        self.last_velocity = self.velocity
-                        stop_velocity = self.velocity_to_zero()
-                        self.pub_velocity.publish(stop_velocity)
-                        self.last_time = rospy.Time.now()
-                        self.needToStop = True
-                        self.last_seen_aruco = ids[i]
-                        return
+                
                     
                         
 
@@ -281,6 +282,17 @@ class calibration:
                     print(distance)
                     # Solo se la distanza dall'aruco visto e' minore di 1.2 metri procedo, cosi' da avere maggiore accuratezza
                     if distance < 1.5:
+
+                        if not self.needToStop:
+                            if self.last_seen_aruco != ids[i] or (int)(time.time()) - self.last_time_seen_aruco > self.time_to_pass_since_last:
+                                self.last_velocity = self.velocity
+                                stop_velocity = self.velocity_to_zero()
+                                self.pub_velocity.publish(stop_velocity)
+                                print("[STOP]: Stopping for " + str((int)(time.time()) - self.last_time_seen_aruco) + " seconds")
+                                self.last_time_seen_aruco = (int)(time.time())
+                                self.needToStop = True
+                                self.last_seen_aruco = ids[i]
+                                return
 
                         map_camera_ori_quat = Quaternion(a = cam.orientation.w, b = cam.orientation.x, c = cam.orientation.y, d = cam.orientation.z)
                         map_T_camera = np.zeros((4,4))
@@ -328,12 +340,12 @@ class calibration:
                         pose.pose.pose.orientation.y = quat_map_base[2]
                         pose.pose.pose.orientation.z = quat_map_base[3]
                         pose.pose.pose.orientation.w = quat_map_base[0]
-                        print("Ripubblico la posizione")
+                        print("[INFO]: Ripubblico la posizione")
                         self.pub_myPos.publish(pose)
 
                         self.pub_velocity.publish(self.last_velocity)
                         self.needToStop = False
-                        self.last_time_seen_aruco = rospy.Time.now()
+                        self.last_time_seen_aruco = (int)(time.time())
                         self.last_seen_aruco = ids[i]
 
     
