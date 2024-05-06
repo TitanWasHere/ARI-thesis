@@ -69,13 +69,14 @@ class calibration:
         self.map_to_headCamera = None
 
         self.velocity = Twist()
-
-        self.seconds_to_wait = 2
-
+        self.last_velocity = Twist()
         self.last_seen_aruco = None
-        self.needToWait = False
+        self.needToStop = False
         self.time_to_pass_since_last = 10
-        self.last_time = 0
+        self.timeToPassSinceStopped = 2
+        self.last_time_seen_aruco = 0
+        self.needToRecalibrate = False
+    
         #self.can_restart_moving = True
 
     
@@ -144,6 +145,8 @@ class calibration:
         cv2.imshow('image_torso', frame)
         cv2.waitKey(1)
 
+        
+
         self.manage_frame(frame, tvec, rvec, ids, "torso" )
 
 
@@ -165,6 +168,9 @@ class calibration:
 
     def get_pose(self, frame, width=848):
         
+        if self.needToStop and rospy.Time.now() - self.last_time < rospy.Duration(self.timeToPassSinceStopped):
+            return frame, None, None, None
+
         #cv2.imshow('image', frame)
         #cv2.waitKey(1)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -189,12 +195,21 @@ class calibration:
             frame = cv2.aruco.drawDetectedMarkers(frame, corners,ids)
             for i in range(len(ids)):
                 frame = cv2.aruco.drawAxis(frame, INTRINSIC_USED, DISTORTION_USED, rvec[i], tvec[i], 0.1)
-                #print('[' + str(ids[i]) + ']: { tvec: ' + str(tvec[i][0]) + ' rvec: ' + str(rvec[i][0]) + ' }')
+                #print('[' + str(ids[i]) + ']: { tvec: ' + str(tvec[i][0]) + ' rvec: ' + str(rvec[i][0]) + ' }')frame
 
             #frame = cv2.aruco.drawAxis(frame, INTRINSIC_CAMERA, DISTORTION_CAMERA, rvec, tvec, 0.1)
             return frame, tvec, rvec, ids
         return frame, None, None, None
 
+    def velocity_to_zero(self):
+        velocity = Twist()
+        velocity.linear.x = 0
+        velocity.linear.y = 0
+        velocity.linear.z = 0
+        velocity.angular.x = 0
+        velocity.angular.y = 0
+        velocity.angular.z = 0
+        return velocity
     
     def manage_frame(self, frame, tvec, rvec, ids, type):
         #self.publish_arucos_in_map()
@@ -203,12 +218,34 @@ class calibration:
         if ids is not None:
 
             for i in range(len(ids)):
-                # if self.needToWait:
-                #     if rospy.Time.now() - self.last_time > rospy.Duration(self.seconds_to_wait):
-                #         self.needToWait = False
-                #         self.last_time = 0
-                #     else:
-                #         break
+                
+                # if self.last_seen_aruco != ids[i] or rospy.Time.now() - self.last_time > self.time_to_pass_since_last:
+                #     self.last_velocity = self.velocity
+                #     stop_velocity = self.velocity_to_zero()
+                #     self.pub_velocity.publish(stop_velocity)
+                #     self.needToStop = True
+                #     self.needToRecalibrate = True
+                #     return
+                # else:
+                #     my_velocity = self.last_velocity
+                #     self.needToStop = False
+                #     if self.needToRecalibrate:
+                #         self.needToRecalibrate = False
+                #         self.last_time = rospy.Time.now()
+                #         self.last_seen_aruco = ids[i]
+                    
+                if not self.needToStop:
+                    if self.last_seen_aruco != ids[i] or rospy.Time.now() - self.last_time > rospy.Duration(self.time_to_pass_since_last):
+                        self.last_velocity = self.velocity
+                        stop_velocity = self.velocity_to_zero()
+                        self.pub_velocity.publish(stop_velocity)
+                        self.last_time = rospy.Time.now()
+                        self.needToStop = True
+                        self.last_seen_aruco = ids[i]
+                        return
+                    
+                        
+
 
 
                 try:
@@ -294,9 +331,12 @@ class calibration:
                         print("Ripubblico la posizione")
                         self.pub_myPos.publish(pose)
 
-                    
+                        self.pub_velocity.publish(self.last_velocity)
+                        self.needToStop = False
+                        self.last_time_seen_aruco = rospy.Time.now()
+                        self.last_seen_aruco = ids[i]
 
-
+    
                 except KeyError:
                     print('Aruco not found')
                     return

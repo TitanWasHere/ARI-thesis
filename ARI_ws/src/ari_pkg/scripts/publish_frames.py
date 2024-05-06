@@ -39,6 +39,7 @@ class FramePublisher:
                 t.transform.rotation.w = q.w
                 #print(t)
                 br.sendTransform(t)
+                #print("Published " + name)
                 
 
 
