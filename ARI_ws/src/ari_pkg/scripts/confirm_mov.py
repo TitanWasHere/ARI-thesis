@@ -11,6 +11,9 @@ import subprocess
 from pal_navigation_msgs.msg import GoToPOIActionGoal
 from visualization_msgs.msg import InteractiveMarkerUpdate
 
+wavs_name_dir = "muse"
+poi_file_name = "muse_poi.json"
+
 class checkMovement:
     def __init__(self):
         rospy.init_node('check_POI')
@@ -20,8 +23,9 @@ class checkMovement:
         self.pub_status = rospy.Publisher('/POI/move/status', String, queue_size=2)
         self.firstFound = ""
         self.current_dir = os.path.dirname(os.path.abspath(__file__))
-        self.path_wavs = "../wavs/andre/"
+        self.path_wavs = "../wavs/" + wavs_name_dir + "/"
         self.allMarkers = {}
+        self.detected_POI = {}
 
         self.recognizer = sr.Recognizer()
 
@@ -47,12 +51,12 @@ class checkMovement:
         #       "keywords": ["keyword1", "keyword2", "keyword3"]
         #     }
         # }
-        with open(os.path.join(current_dir, 'points_of_interest.json'), 'r') as file:
+        with open(os.path.join(current_dir, poi_file_name), 'r') as file:
             self.poi = json.load(file)
 
         poi_name = None
         #print("[INFO]: poi detected in map: " + str(self.poi))
-        detected_POI = {}
+        
 
         found = False
 
@@ -62,22 +66,26 @@ class checkMovement:
                 if not found and keyword.lower() in spoken_text.lower():
                     poi_name = name
                     found = True
-                    detected_POI[poi_name] = self.poi[poi_name]["spoken_name"]
+                    self.detected_POI[poi_name] = self.poi[poi_name]["spoken_name"]
                     if self.firstFound == "":
                         self.firstFound = poi_name
 
         response = False
 
-        if len(detected_POI) == 0:
+        if len(self.detected_POI) == 0:
             rospy.logwarn("No POI found")
-            self.pub_status.publish("not_found")
+            stat = String()
+            stat.data = "not_found"
+            self.pub_status.publish(stat)
             return
         else:
-            print("[INFO]: POI found: " + str(detected_POI))
-            response = self.confirm_POI(detected_POI)
+            print("[INFO]: POI found: " + str(self.detected_POI))
+            response = self.confirm_POI(self.detected_POI)
 
         if response is False:
-            self.pub_status.publish("not_found")
+            stat = String()
+            stat.data = "not_found"
+            self.pub_status.publish(stat)
         else:
             self.goto_POI(response)
 
@@ -86,8 +94,10 @@ class checkMovement:
 
     def confirm_POI(self, POIs):
         print("[INFO]: Point to check: " + str(POIs[self.firstFound]))
-        self.say_something("Confermi di voler andare a " + POIs[self.firstFound] + "? Dimmi si o no", "confirm_"+self.firstFound)
-        response = self.wait_confirm()
+        # TODO : CHECK THE CONFIRM
+        #self.say_something("Confermi di voler andare a " + POIs[self.firstFound] + "? Dimmi si o no", "confirm_"+self.firstFound)
+        response = True #self.wait_confirm()
+
         if response is False:
             if len(POIs) > 1:
                 # In caso non va bene, salvo in una stringa tutti gli altri POI trovati
@@ -102,11 +112,12 @@ class checkMovement:
             else:
                 return False
         else:
-            return POIs[self.firstFound]
+            return self.firstFound
     
     def goto_POI(self, name):
+        sp_name = self.detected_POI[name]
 
-        self.say_something("Sto andando a " + name , "goto_" + name)
+        self.say_something("Vado a " + sp_name , "goto_" + sp_name)
         
         self.goal_msg = GoToPOIActionGoal()
         self.goal_msg.header.seq = 0
@@ -116,11 +127,15 @@ class checkMovement:
         self.goal_msg.goal_id.id = ''
         self.goal_msg.goal.poi.data = name
         self.goal.publish(self.goal_msg)
+        print("[INFO]: vado alla pos" + name)
+
+        self.say_something("Qui abbiamo un trattorino" , "talk_trattorino")
                         
 
     def wait_confirm_for_more_POIs(self, POIs):
         count = 0
         while True:
+            self.recognizer = sr.Recognizer()
             
             with sr.Microphone() as source:
                 self.recognizer.adjust_for_ambient_noise(source)
@@ -142,6 +157,7 @@ class checkMovement:
     
     def wait_confirm(self):
         while True:
+            self.recognizer = sr.Recognizer()
             with sr.Microphone() as source:
                 self.recognizer.adjust_for_ambient_noise(source)
                 audio = self.recognizer.listen(source)
@@ -157,7 +173,7 @@ class checkMovement:
 
     def say_something(self, text, fileName=None):
         
-        if fileName is None or self.checkExistance(fileName) is False :
+        if self.checkExistance(fileName) is False :
             if fileName is None:
                 fileName = "response"
             print("[INFO]: Dico qualcosa con nome del file " + fileName)

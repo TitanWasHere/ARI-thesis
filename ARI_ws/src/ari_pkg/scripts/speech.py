@@ -9,24 +9,27 @@ from gtts import gTTS
 import subprocess
 from visualization_msgs.msg import InteractiveMarkerUpdate
 
+wavs_name_dir = "muse" # prima era andre
+topics_file_name = "muse_topics.json"
+responses_file_name = "muse_responses.json" # prima era responses.json
+
+
+
 class SpeechRecognizer:
     def __init__(self):
         rospy.init_node('speech_recognizer')
         self.goal = rospy.Publisher('/poi_navigation_server/go_to_poi/goal', GoToPOIActionGoal, queue_size=2)
         self.check_goto = rospy.Publisher('/POI/move/check', String, queue_size=2)
-        self.path_wavs = "../wavs/andre/"
+        self.sub_speech = rospy.Subscriber('/POI/move/status', String, self.callback)
+        self.path_wavs = "../wavs/" + wavs_name_dir + "/"
         self.resp_cycle = {}
-
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        file_path = os.path.join(current_dir, 'nome_file.json')
-
 
         # Carica il file JSON con i topic
         self.current_dir = os.path.dirname(os.path.abspath(__file__))
-        with open(os.path.join(self.current_dir,'topics.json'), 'r') as file:
+        with open(os.path.join(self.current_dir, topics_file_name), 'r') as file:
             self.topics = json.load(file)
         
-
+        self.result_from_move = None
         # {
         #     "topic_name": {
         #         "fileName": ["name1", "name2", "name3],
@@ -34,7 +37,7 @@ class SpeechRecognizer:
         #     }
         # }
         # Carica il file JSON con le risposte
-        with open(os.path.join(self.current_dir,'responses.json'), 'r') as file:
+        with open(os.path.join(self.current_dir, responses_file_name), 'r') as file:
             self.responses = json.load(file)
             
             for topicName, data in self.responses.items():
@@ -46,7 +49,11 @@ class SpeechRecognizer:
         # Avvia l'ascolto del microfono
         self.listen_microphone()
 
+        
 
+    def callback(self, data):
+        print("[INFO]: Received: " + data.data)
+        self.result_from_move = data.data
 
     def listen_microphone(self):
         print("[INFO]: In ascolto... Parla pure!")
@@ -56,6 +63,7 @@ class SpeechRecognizer:
 
         print("[INFO]: Riconoscimento in corso...")
         try:
+            self.recognizer = sr.Recognizer()
             spoken_text = self.recognizer.recognize_google(audio, language='it-IT').lower()
             print("Hai detto: " + spoken_text)
             found_something = False
@@ -90,14 +98,19 @@ class SpeechRecognizer:
                         else:
                             try:
                                 self.check_goto.publish(spoken_text)
-                                res = rospy.wait_for_message('/POI/move/status', String, timeout=None)
-                                print(res)
-                                if res.data == "not_found":
+                                #res = rospy.wait_for_message('/POI/move/status', String, timeout=None)
+                                while self.result_from_move is None:
+                                    pass
+
+                                print(self.result_from_move)
+                                if self.result_from_move.data == "not_found":
                                     response = "no_POI"
+
+                                self.result_from_move = None
                             except rospy.ROSException:
                                 res = "error"
                                 rospy.logerr("Timeout reached")
-                                self.say_something("Errore, non ho stato trovato niente, prova a ripetere", "no_POI")
+                                self.say_something("Errore, non ho trovato niente, prova a ripetere", "no_POI")
                                 
                         found_something = True
                 
@@ -120,7 +133,7 @@ class SpeechRecognizer:
             if fileName is None:
                 fileName = "response"
             print("[INFO]: Dico qualcosa con nome del file " + fileName)
-            tts = gTTS(text=text, lang='it')
+            tts = gTTS(text=text, language='it-IT')
             
             newName = os.path.join(self.current_dir,self.path_wavs) + fileName
             tts.save(newName + ".mp3")
