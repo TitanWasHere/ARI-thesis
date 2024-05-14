@@ -10,13 +10,26 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   tf
   tf2
+  message_generation
+)
+add_service_files(
+  FILES
+  msgs.srv
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
 )
 
 catkin_package(
-
+  CATKIN_DEPENDS message_runtime
 )
 
-
+catkin_install_python(PROGRAMS scripts/make_wavs.py scripts/speech.py scripts/confirm_mov.py
+	DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+ 
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}

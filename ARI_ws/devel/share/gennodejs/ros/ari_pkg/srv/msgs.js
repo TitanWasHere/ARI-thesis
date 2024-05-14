@@ -1,0 +1,1 @@
+/home/user/exchange/ARI_ws/devel/.private/ari_pkg/share/gennodejs/ros/ari_pkg/srv/msgs.js
