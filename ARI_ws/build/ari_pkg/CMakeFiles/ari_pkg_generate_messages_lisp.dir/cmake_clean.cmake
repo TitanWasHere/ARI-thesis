@@ -1,5 +1,7 @@
 file(REMOVE_RECURSE
+  "/home/user/exchange/ARI_ws/devel/.private/ari_pkg/share/common-lisp/ros/ari_pkg/srv/msgPOI.lisp"
   "/home/user/exchange/ARI_ws/devel/.private/ari_pkg/share/common-lisp/ros/ari_pkg/srv/msgs.lisp"
+  "/home/user/exchange/ARI_ws/devel/.private/ari_pkg/share/common-lisp/ros/ari_pkg/srv/wavs_msg.lisp"
   "CMakeFiles/ari_pkg_generate_messages_lisp"
 )
 

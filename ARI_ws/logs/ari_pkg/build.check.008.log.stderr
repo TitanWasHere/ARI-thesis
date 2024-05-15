@@ -1,0 +1,38 @@
+CMake Deprecation Warning at /usr/src/googletest/CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 2.8.12 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+
+CMake Deprecation Warning at /usr/src/googletest/googlemock/CMakeLists.txt:41 (cmake_minimum_required):
+  Compatibility with CMake < 2.8.12 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+
+CMake Deprecation Warning at /usr/src/googletest/googletest/CMakeLists.txt:48 (cmake_minimum_required):
+  Compatibility with CMake < 2.8.12 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+
+[31m[1mCMake Error[0m at /home/user/exchange/ARI_ws/build/ari_pkg/cmake/ari_pkg-genmsg.cmake:3 (message):
+  Could not find messages which
+  '/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgPOI.srv' depends on.  Did
+  you forget to specify generate_messages(DEPENDENCIES ...)?
+
+  Cannot locate message [PoseStamped]: unknown package [geometry_msgs] on
+  search path [{{'std_msgs':
+  ['/opt/ros/melodic/share/std_msgs/cmake/../msg']}}]
+[36mCall Stack (most recent call first):[0m
+  /opt/ros/melodic/share/genmsg/cmake/genmsg-extras.cmake:307 (include)
+  CMakeLists.txt:22 (generate_messages)
+
+
+make: *** [cmake_check_build_system] Error 1

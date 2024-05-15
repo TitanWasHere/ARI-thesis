@@ -1,8 +1,8 @@
 # generated from genmsg/cmake/pkg-genmsg.cmake.em
 
-message(STATUS "ari_pkg: 0 messages, 1 services")
+message(STATUS "ari_pkg: 0 messages, 3 services")
 
-set(MSG_I_FLAGS "-Istd_msgs:/opt/ros/melodic/share/std_msgs/cmake/../msg")
+set(MSG_I_FLAGS "-Istd_msgs:/opt/ros/melodic/share/std_msgs/cmake/../msg;-Igeometry_msgs:/opt/ros/melodic/share/geometry_msgs/cmake/../msg")
 
 # Find all generators
 find_package(gencpp REQUIRED)
@@ -22,6 +22,16 @@ add_custom_target(_ari_pkg_generate_messages_check_deps_${_filename}
   COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "ari_pkg" "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgs.srv" ""
 )
 
+get_filename_component(_filename "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgPOI.srv" NAME_WE)
+add_custom_target(_ari_pkg_generate_messages_check_deps_${_filename}
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "ari_pkg" "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgPOI.srv" "geometry_msgs/Pose:geometry_msgs/Quaternion:geometry_msgs/Point:geometry_msgs/PoseStamped:std_msgs/Header"
+)
+
+get_filename_component(_filename "/home/user/exchange/ARI_ws/src/ari_pkg/srv/wavs_msg.srv" NAME_WE)
+add_custom_target(_ari_pkg_generate_messages_check_deps_${_filename}
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "ari_pkg" "/home/user/exchange/ARI_ws/src/ari_pkg/srv/wavs_msg.srv" ""
+)
+
 #
 #  langs = gencpp;geneus;genlisp;gennodejs;genpy
 #
@@ -32,6 +42,18 @@ add_custom_target(_ari_pkg_generate_messages_check_deps_${_filename}
 ### Generating Services
 _generate_srv_cpp(ari_pkg
   "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgs.srv"
+  "${MSG_I_FLAGS}"
+  ""
+  ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/ari_pkg
+)
+_generate_srv_cpp(ari_pkg
+  "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgPOI.srv"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/melodic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/melodic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/melodic/share/geometry_msgs/cmake/../msg/Point.msg;/opt/ros/melodic/share/geometry_msgs/cmake/../msg/PoseStamped.msg;/opt/ros/melodic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/ari_pkg
+)
+_generate_srv_cpp(ari_pkg
+  "/home/user/exchange/ARI_ws/src/ari_pkg/srv/wavs_msg.srv"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/ari_pkg
@@ -51,6 +73,10 @@ add_dependencies(ari_pkg_generate_messages ari_pkg_generate_messages_cpp)
 # add dependencies to all check dependencies targets
 get_filename_component(_filename "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgs.srv" NAME_WE)
 add_dependencies(ari_pkg_generate_messages_cpp _ari_pkg_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgPOI.srv" NAME_WE)
+add_dependencies(ari_pkg_generate_messages_cpp _ari_pkg_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/user/exchange/ARI_ws/src/ari_pkg/srv/wavs_msg.srv" NAME_WE)
+add_dependencies(ari_pkg_generate_messages_cpp _ari_pkg_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
 add_custom_target(ari_pkg_gencpp)
@@ -65,6 +91,18 @@ list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS ari_pkg_generate_messages_cpp)
 ### Generating Services
 _generate_srv_eus(ari_pkg
   "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgs.srv"
+  "${MSG_I_FLAGS}"
+  ""
+  ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/ari_pkg
+)
+_generate_srv_eus(ari_pkg
+  "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgPOI.srv"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/melodic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/melodic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/melodic/share/geometry_msgs/cmake/../msg/Point.msg;/opt/ros/melodic/share/geometry_msgs/cmake/../msg/PoseStamped.msg;/opt/ros/melodic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/ari_pkg
+)
+_generate_srv_eus(ari_pkg
+  "/home/user/exchange/ARI_ws/src/ari_pkg/srv/wavs_msg.srv"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/ari_pkg
@@ -84,6 +122,10 @@ add_dependencies(ari_pkg_generate_messages ari_pkg_generate_messages_eus)
 # add dependencies to all check dependencies targets
 get_filename_component(_filename "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgs.srv" NAME_WE)
 add_dependencies(ari_pkg_generate_messages_eus _ari_pkg_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgPOI.srv" NAME_WE)
+add_dependencies(ari_pkg_generate_messages_eus _ari_pkg_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/user/exchange/ARI_ws/src/ari_pkg/srv/wavs_msg.srv" NAME_WE)
+add_dependencies(ari_pkg_generate_messages_eus _ari_pkg_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
 add_custom_target(ari_pkg_geneus)
@@ -98,6 +140,18 @@ list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS ari_pkg_generate_messages_eus)
 ### Generating Services
 _generate_srv_lisp(ari_pkg
   "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgs.srv"
+  "${MSG_I_FLAGS}"
+  ""
+  ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/ari_pkg
+)
+_generate_srv_lisp(ari_pkg
+  "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgPOI.srv"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/melodic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/melodic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/melodic/share/geometry_msgs/cmake/../msg/Point.msg;/opt/ros/melodic/share/geometry_msgs/cmake/../msg/PoseStamped.msg;/opt/ros/melodic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/ari_pkg
+)
+_generate_srv_lisp(ari_pkg
+  "/home/user/exchange/ARI_ws/src/ari_pkg/srv/wavs_msg.srv"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/ari_pkg
@@ -117,6 +171,10 @@ add_dependencies(ari_pkg_generate_messages ari_pkg_generate_messages_lisp)
 # add dependencies to all check dependencies targets
 get_filename_component(_filename "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgs.srv" NAME_WE)
 add_dependencies(ari_pkg_generate_messages_lisp _ari_pkg_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgPOI.srv" NAME_WE)
+add_dependencies(ari_pkg_generate_messages_lisp _ari_pkg_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/user/exchange/ARI_ws/src/ari_pkg/srv/wavs_msg.srv" NAME_WE)
+add_dependencies(ari_pkg_generate_messages_lisp _ari_pkg_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
 add_custom_target(ari_pkg_genlisp)
@@ -131,6 +189,18 @@ list(APPEND ${PROJECT_NAME}_EXPORTED_TARGETS ari_pkg_generate_messages_lisp)
 ### Generating Services
 _generate_srv_nodejs(ari_pkg
   "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgs.srv"
+  "${MSG_I_FLAGS}"
+  ""
+  ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/ari_pkg
+)
+_generate_srv_nodejs(ari_pkg
+  "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgPOI.srv"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/melodic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/melodic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/melodic/share/geometry_msgs/cmake/../msg/Point.msg;/opt/ros/melodic/share/geometry_msgs/cmake/../msg/PoseStamped.msg;/opt/ros/melodic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/ari_pkg
+)
+_generate_srv_nodejs(ari_pkg
+  "/home/user/exchange/ARI_ws/src/ari_pkg/srv/wavs_msg.srv"
   "${MSG_I_FLAGS}"
   ""
   ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/ari_pkg
@@ -150,6 +220,10 @@ add_dependencies(ari_pkg_generate_messages ari_pkg_generate_messages_nodejs)
 # add dependencies to all check dependencies targets
 get_filename_component(_filename "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgs.srv" NAME_WE)
 add_dependencies(ari_pkg_generate_messages_nodejs _ari_pkg_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgPOI.srv" NAME_WE)
+add_dependencies(ari_pkg_generate_messages_nodejs _ari_pkg_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/user/exchange/ARI_ws/src/ari_pkg/srv/wavs_msg.srv" NAME_WE)
+add_dependencies(ari_pkg_generate_messages_nodejs _ari_pkg_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
 add_custom_target(ari_pkg_gennodejs)
@@ -168,6 +242,18 @@ _generate_srv_py(ari_pkg
   ""
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/ari_pkg
 )
+_generate_srv_py(ari_pkg
+  "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgPOI.srv"
+  "${MSG_I_FLAGS}"
+  "/opt/ros/melodic/share/geometry_msgs/cmake/../msg/Pose.msg;/opt/ros/melodic/share/geometry_msgs/cmake/../msg/Quaternion.msg;/opt/ros/melodic/share/geometry_msgs/cmake/../msg/Point.msg;/opt/ros/melodic/share/geometry_msgs/cmake/../msg/PoseStamped.msg;/opt/ros/melodic/share/std_msgs/cmake/../msg/Header.msg"
+  ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/ari_pkg
+)
+_generate_srv_py(ari_pkg
+  "/home/user/exchange/ARI_ws/src/ari_pkg/srv/wavs_msg.srv"
+  "${MSG_I_FLAGS}"
+  ""
+  ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/ari_pkg
+)
 
 ### Generating Module File
 _generate_module_py(ari_pkg
@@ -182,6 +268,10 @@ add_dependencies(ari_pkg_generate_messages ari_pkg_generate_messages_py)
 
 # add dependencies to all check dependencies targets
 get_filename_component(_filename "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgs.srv" NAME_WE)
+add_dependencies(ari_pkg_generate_messages_py _ari_pkg_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgPOI.srv" NAME_WE)
+add_dependencies(ari_pkg_generate_messages_py _ari_pkg_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/user/exchange/ARI_ws/src/ari_pkg/srv/wavs_msg.srv" NAME_WE)
 add_dependencies(ari_pkg_generate_messages_py _ari_pkg_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
@@ -203,6 +293,9 @@ endif()
 if(TARGET std_msgs_generate_messages_cpp)
   add_dependencies(ari_pkg_generate_messages_cpp std_msgs_generate_messages_cpp)
 endif()
+if(TARGET geometry_msgs_generate_messages_cpp)
+  add_dependencies(ari_pkg_generate_messages_cpp geometry_msgs_generate_messages_cpp)
+endif()
 
 if(geneus_INSTALL_DIR AND EXISTS ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/ari_pkg)
   # install generated code
@@ -213,6 +306,9 @@ if(geneus_INSTALL_DIR AND EXISTS ${CATKIN_DEVEL_PREFIX}/${geneus_INSTALL_DIR}/ar
 endif()
 if(TARGET std_msgs_generate_messages_eus)
   add_dependencies(ari_pkg_generate_messages_eus std_msgs_generate_messages_eus)
+endif()
+if(TARGET geometry_msgs_generate_messages_eus)
+  add_dependencies(ari_pkg_generate_messages_eus geometry_msgs_generate_messages_eus)
 endif()
 
 if(genlisp_INSTALL_DIR AND EXISTS ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/ari_pkg)
@@ -225,6 +321,9 @@ endif()
 if(TARGET std_msgs_generate_messages_lisp)
   add_dependencies(ari_pkg_generate_messages_lisp std_msgs_generate_messages_lisp)
 endif()
+if(TARGET geometry_msgs_generate_messages_lisp)
+  add_dependencies(ari_pkg_generate_messages_lisp geometry_msgs_generate_messages_lisp)
+endif()
 
 if(gennodejs_INSTALL_DIR AND EXISTS ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_DIR}/ari_pkg)
   # install generated code
@@ -235,6 +334,9 @@ if(gennodejs_INSTALL_DIR AND EXISTS ${CATKIN_DEVEL_PREFIX}/${gennodejs_INSTALL_D
 endif()
 if(TARGET std_msgs_generate_messages_nodejs)
   add_dependencies(ari_pkg_generate_messages_nodejs std_msgs_generate_messages_nodejs)
+endif()
+if(TARGET geometry_msgs_generate_messages_nodejs)
+  add_dependencies(ari_pkg_generate_messages_nodejs geometry_msgs_generate_messages_nodejs)
 endif()
 
 if(genpy_INSTALL_DIR AND EXISTS ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/ari_pkg)
@@ -247,4 +349,7 @@ if(genpy_INSTALL_DIR AND EXISTS ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/ari_
 endif()
 if(TARGET std_msgs_generate_messages_py)
   add_dependencies(ari_pkg_generate_messages_py std_msgs_generate_messages_py)
+endif()
+if(TARGET geometry_msgs_generate_messages_py)
+  add_dependencies(ari_pkg_generate_messages_py geometry_msgs_generate_messages_py)
 endif()

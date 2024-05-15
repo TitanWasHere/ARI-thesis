@@ -39,6 +39,21 @@ CMake Deprecation Warning at /usr/src/googletest/googletest/CMakeLists.txt:48 (c
 [36m--[0m catkin 0.7.29
 [36m--[0m BUILD_SHARED_LIBS is on
 [36m--[0m Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
-[36m--[0m Configuring done
-[36m--[0m Generating done
-[36m--[0m Build files have been written to: /home/user/exchange/ARI_ws/build/ari_pkg
+[31m[1mCMake Error[0m at /home/user/exchange/ARI_ws/build/ari_pkg/cmake/ari_pkg-genmsg.cmake:3 (message):
+  Could not find messages which
+  '/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgPOI.srv' depends on.  Did
+  you forget to specify generate_messages(DEPENDENCIES ...)?
+
+  Cannot locate message [PoseStamped]: unknown package [geometry_msgs] on
+  search path [{{'std_msgs':
+  ['/opt/ros/melodic/share/std_msgs/cmake/../msg']}}]
+[36mCall Stack (most recent call first):[0m
+  /opt/ros/melodic/share/genmsg/cmake/genmsg-extras.cmake:307 (include)
+  CMakeLists.txt:22 (generate_messages)
+
+
+[36m--[0m Configuring incomplete, errors occurred!
+See also "/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles/CMakeOutput.log".
+See also "/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles/CMakeError.log".
+Makefile:1137: recipe for target 'cmake_check_build_system' failed
+make: *** [cmake_check_build_system] Error 1

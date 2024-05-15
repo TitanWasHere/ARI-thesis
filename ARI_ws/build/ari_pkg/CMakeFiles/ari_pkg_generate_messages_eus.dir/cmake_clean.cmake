@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
   "/home/user/exchange/ARI_ws/devel/.private/ari_pkg/share/roseus/ros/ari_pkg/manifest.l"
+  "/home/user/exchange/ARI_ws/devel/.private/ari_pkg/share/roseus/ros/ari_pkg/srv/msgPOI.l"
   "/home/user/exchange/ARI_ws/devel/.private/ari_pkg/share/roseus/ros/ari_pkg/srv/msgs.l"
+  "/home/user/exchange/ARI_ws/devel/.private/ari_pkg/share/roseus/ros/ari_pkg/srv/wavs_msg.l"
   "CMakeFiles/ari_pkg_generate_messages_eus"
 )
 

@@ -9,8 +9,18 @@ class prova:
         
         rospy.wait_for_service("callback")
         self.callback = rospy.ServiceProxy("callback", msgs)
+    
         resp = self.callback("ciao")
-
-        print(resp)
+        
+        
+        print(resp.msg)
 
         rospy.spin()
+
+
+if __name__ == "__main__":
+    try:
+        prova()
+        
+    except rospy.ROSInterruptException:
+        pass

@@ -1,0 +1,1 @@
+/home/user/exchange/ARI_ws/devel/.private/ari_pkg/share/common-lisp/ros/ari_pkg/srv/_package_wavs_msg.lisp

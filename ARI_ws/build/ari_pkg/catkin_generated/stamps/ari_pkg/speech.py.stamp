@@ -4,13 +4,12 @@ import json
 import speech_recognition as sr
 from std_msgs.msg import String, Float64MultiArray
 import os
-from pal_navigation_msgs.msg import GoToPOIActionGoal
+#from pal_navigation_msgs.msg import GoToPOIActionGoal
 from gtts import gTTS
 import subprocess
 from visualization_msgs.msg import InteractiveMarkerUpdate
 # import .srv
-#from ari_pkg.srv import msgs 
-#kisscami was here, baciniiiii
+from ari_pkg.srv import msgs, msgsResponse
 
 wavs_name_dir = "muse" # prima era andre
 topics_file_name = "muse_topics.json"
@@ -21,7 +20,7 @@ responses_file_name = "muse_responses.json" # prima era responses.json
 class SpeechRecognizer:
     def __init__(self):
         rospy.init_node('speech_recognizer')
-        self.goal = rospy.Publisher('/poi_navigation_server/go_to_poi/goal', GoToPOIActionGoal, queue_size=2)
+        #self.goal = rospy.Publisher('/poi_navigation_server/go_to_poi/goal', GoToPOIActionGoal, queue_size=2)
         self.check_goto = rospy.Publisher('/POI/move/check', String, queue_size=2)
         self.sub_speech = rospy.Subscriber('/POI/move/status', String, self.callback)
         self.path_wavs = "../wavs/" + wavs_name_dir + "/"
@@ -54,9 +53,9 @@ class SpeechRecognizer:
 
         
 
-    def callback(self, data):
-        print("[INFO]: Received: " + data.data)
-        self.result_from_move.data = data.data
+    # def callback(self, data):
+    #     print("[INFO]: Received: " + data.data)
+    #     self.result_from_move.data = data.data
 
     def listen_microphone(self):
         print("[INFO]: In ascolto... Parla pure!")
@@ -100,16 +99,28 @@ class SpeechRecognizer:
                         
                         else:
                             try:
-                                self.check_goto.publish(spoken_text)
-                                #res = rospy.wait_for_message('/POI/move/status', String, timeout=None)
-                                while self.result_from_move.data == '':
-                                    pass
+                                # self.check_goto.publish(spoken_text)
+                                # #res = rospy.wait_for_message('/POI/move/status', String, timeout=None)
+                                # while self.result_from_move.data == '':
+                                #     pass
 
-                                print(self.result_from_move.data)
-                                if self.result_from_move.data == "not_found":
+                                # print(self.result_from_move.data)
+                                # if self.result_from_move.data == "not_found":
+                                #     response = "no_POI"
+
+                                #self.result_from_move.data = ''
+
+                                # USING SERVICE AND NOT TOPIC
+                                rospy.wait_for_service("/POI/move/check")
+                                call = rospy.ServiceProxy("/POI/move/check", msgs)
+                                res = call(spoken_text).msg
+
+                                if res == "not_found":
                                     response = "no_POI"
+                                else:
+                                    response = "found_POI"
 
-                                self.result_from_move.data = ''
+
                             except rospy.ROSException:
                                 res = "error"
                                 rospy.logerr("Timeout reached")

@@ -23,9 +23,6 @@ class checkMovement:
         self.sub_speech = rospy.Subscriber('/POI/move/check', String, self.callback)
         self.pub_status = rospy.Publisher('/POI/move/status', String, queue_size=2)
 
-        # Define the server service
-        s = rospy.Service("/POI/move/check" , msgs, self.callback)
-
         self.firstFound = ""
         self.current_dir = os.path.dirname(os.path.abspath(__file__))
         self.path_wavs = "../wavs/" + wavs_name_dir + "/"

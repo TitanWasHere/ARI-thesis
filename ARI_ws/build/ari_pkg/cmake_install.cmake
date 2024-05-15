@@ -134,7 +134,11 @@ file(INSTALL DESTINATION "/home/user/exchange/ARI_ws/install" TYPE FILE FILES "/
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/ari_pkg/srv" TYPE FILE FILES "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgs.srv")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/ari_pkg/srv" TYPE FILE FILES
+    "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgs.srv"
+    "/home/user/exchange/ARI_ws/src/ari_pkg/srv/wavs_msg.srv"
+    "/home/user/exchange/ARI_ws/src/ari_pkg/srv/msgPOI.srv"
+    )
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)

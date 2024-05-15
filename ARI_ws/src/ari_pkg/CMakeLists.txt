@@ -16,11 +16,13 @@ add_service_files(
   FILES
   msgs.srv
   wavs_msg.srv
+  msgPOI.srv
 )
 
 generate_messages(
   DEPENDENCIES
   std_msgs
+  geometry_msgs
 )
 
 catkin_package(

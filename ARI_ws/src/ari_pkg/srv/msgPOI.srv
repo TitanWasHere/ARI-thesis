@@ -1,0 +1,4 @@
+string[] poi_names
+---
+bool found
+string poi_name_out

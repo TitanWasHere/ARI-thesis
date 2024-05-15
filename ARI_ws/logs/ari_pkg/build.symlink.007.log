@@ -1,0 +1,36 @@
+Linked: (/home/user/exchange/ARI_ws/devel/.private/ari_pkg/share/gennodejs/ros/ari_pkg/_index.js, /home/user/exchange/ARI_ws/devel/share/gennodejs/ros/ari_pkg/_index.js)
+Linked: (/home/user/exchange/ARI_ws/devel/.private/ari_pkg/share/gennodejs/ros/ari_pkg/srv/_index.js, /home/user/exchange/ARI_ws/devel/share/gennodejs/ros/ari_pkg/srv/_index.js)
+Symlinking /home/user/exchange/ARI_ws/devel/share/gennodejs/ros/ari_pkg/srv/msgPOI.js
+Symlinking /home/user/exchange/ARI_ws/devel/share/gennodejs/ros/ari_pkg/srv/wavs_msg.js
+Linked: (/home/user/exchange/ARI_ws/devel/.private/ari_pkg/share/gennodejs/ros/ari_pkg/srv/msgs.js, /home/user/exchange/ARI_ws/devel/share/gennodejs/ros/ari_pkg/srv/msgs.js)
+Linked: (/home/user/exchange/ARI_ws/devel/.private/ari_pkg/share/ari_pkg/cmake/ari_pkgConfig-version.cmake, /home/user/exchange/ARI_ws/devel/share/ari_pkg/cmake/ari_pkgConfig-version.cmake)
+Linked: (/home/user/exchange/ARI_ws/devel/.private/ari_pkg/share/ari_pkg/cmake/ari_pkgConfig.cmake, /home/user/exchange/ARI_ws/devel/share/ari_pkg/cmake/ari_pkgConfig.cmake)
+Linked: (/home/user/exchange/ARI_ws/devel/.private/ari_pkg/share/ari_pkg/cmake/ari_pkg-msg-paths.cmake, /home/user/exchange/ARI_ws/devel/share/ari_pkg/cmake/ari_pkg-msg-paths.cmake)
+Linked: (/home/user/exchange/ARI_ws/devel/.private/ari_pkg/share/ari_pkg/cmake/ari_pkg-msg-extras.cmake, /home/user/exchange/ARI_ws/devel/share/ari_pkg/cmake/ari_pkg-msg-extras.cmake)
+Linked: (/home/user/exchange/ARI_ws/devel/.private/ari_pkg/share/common-lisp/ros/ari_pkg/srv/_package.lisp, /home/user/exchange/ARI_ws/devel/share/common-lisp/ros/ari_pkg/srv/_package.lisp)
+Linked: (/home/user/exchange/ARI_ws/devel/.private/ari_pkg/share/common-lisp/ros/ari_pkg/srv/ari_pkg-srv.asd, /home/user/exchange/ARI_ws/devel/share/common-lisp/ros/ari_pkg/srv/ari_pkg-srv.asd)
+Symlinking /home/user/exchange/ARI_ws/devel/share/common-lisp/ros/ari_pkg/srv/wavs_msg.lisp
+Linked: (/home/user/exchange/ARI_ws/devel/.private/ari_pkg/share/common-lisp/ros/ari_pkg/srv/_package_msgs.lisp, /home/user/exchange/ARI_ws/devel/share/common-lisp/ros/ari_pkg/srv/_package_msgs.lisp)
+Symlinking /home/user/exchange/ARI_ws/devel/share/common-lisp/ros/ari_pkg/srv/_package_msgPOI.lisp
+Symlinking /home/user/exchange/ARI_ws/devel/share/common-lisp/ros/ari_pkg/srv/_package_wavs_msg.lisp
+Linked: (/home/user/exchange/ARI_ws/devel/.private/ari_pkg/share/common-lisp/ros/ari_pkg/srv/msgs.lisp, /home/user/exchange/ARI_ws/devel/share/common-lisp/ros/ari_pkg/srv/msgs.lisp)
+Symlinking /home/user/exchange/ARI_ws/devel/share/common-lisp/ros/ari_pkg/srv/msgPOI.lisp
+Linked: (/home/user/exchange/ARI_ws/devel/.private/ari_pkg/share/roseus/ros/ari_pkg/manifest.l, /home/user/exchange/ARI_ws/devel/share/roseus/ros/ari_pkg/manifest.l)
+Symlinking /home/user/exchange/ARI_ws/devel/share/roseus/ros/ari_pkg/srv/wavs_msg.l
+Symlinking /home/user/exchange/ARI_ws/devel/share/roseus/ros/ari_pkg/srv/msgPOI.l
+Linked: (/home/user/exchange/ARI_ws/devel/.private/ari_pkg/share/roseus/ros/ari_pkg/srv/msgs.l, /home/user/exchange/ARI_ws/devel/share/roseus/ros/ari_pkg/srv/msgs.l)
+Linked: (/home/user/exchange/ARI_ws/devel/.private/ari_pkg/lib/python2.7/dist-packages/ari_pkg/__init__.py, /home/user/exchange/ARI_ws/devel/lib/python2.7/dist-packages/ari_pkg/__init__.py)
+Symlinking /home/user/exchange/ARI_ws/devel/lib/python2.7/dist-packages/ari_pkg/srv/_wavs_msg.py
+Linked: (/home/user/exchange/ARI_ws/devel/.private/ari_pkg/lib/python2.7/dist-packages/ari_pkg/srv/_msgs.py, /home/user/exchange/ARI_ws/devel/lib/python2.7/dist-packages/ari_pkg/srv/_msgs.py)
+Symlinking /home/user/exchange/ARI_ws/devel/lib/python2.7/dist-packages/ari_pkg/srv/_msgPOI.py
+Linked: (/home/user/exchange/ARI_ws/devel/.private/ari_pkg/lib/python2.7/dist-packages/ari_pkg/srv/__init__.py, /home/user/exchange/ARI_ws/devel/lib/python2.7/dist-packages/ari_pkg/srv/__init__.py)
+Linked: (/home/user/exchange/ARI_ws/devel/.private/ari_pkg/lib/pkgconfig/ari_pkg.pc, /home/user/exchange/ARI_ws/devel/lib/pkgconfig/ari_pkg.pc)
+Symlinking /home/user/exchange/ARI_ws/devel/include/ari_pkg/msgPOIRequest.h
+Symlinking /home/user/exchange/ARI_ws/devel/include/ari_pkg/wavs_msgRequest.h
+Linked: (/home/user/exchange/ARI_ws/devel/.private/ari_pkg/include/ari_pkg/msgsResponse.h, /home/user/exchange/ARI_ws/devel/include/ari_pkg/msgsResponse.h)
+Symlinking /home/user/exchange/ARI_ws/devel/include/ari_pkg/wavs_msg.h
+Linked: (/home/user/exchange/ARI_ws/devel/.private/ari_pkg/include/ari_pkg/msgsRequest.h, /home/user/exchange/ARI_ws/devel/include/ari_pkg/msgsRequest.h)
+Symlinking /home/user/exchange/ARI_ws/devel/include/ari_pkg/msgPOIResponse.h
+Symlinking /home/user/exchange/ARI_ws/devel/include/ari_pkg/wavs_msgResponse.h
+Linked: (/home/user/exchange/ARI_ws/devel/.private/ari_pkg/include/ari_pkg/msgs.h, /home/user/exchange/ARI_ws/devel/include/ari_pkg/msgs.h)
+Symlinking /home/user/exchange/ARI_ws/devel/include/ari_pkg/msgPOI.h

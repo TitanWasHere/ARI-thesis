@@ -1,10 +1,20 @@
 (cl:defpackage ari_pkg-srv
   (:use )
   (:export
+   "MSGPOI"
+   "<MSGPOI-REQUEST>"
+   "MSGPOI-REQUEST"
+   "<MSGPOI-RESPONSE>"
+   "MSGPOI-RESPONSE"
    "MSGS"
    "<MSGS-REQUEST>"
    "MSGS-REQUEST"
    "<MSGS-RESPONSE>"
    "MSGS-RESPONSE"
+   "WAVS_MSG"
+   "<WAVS_MSG-REQUEST>"
+   "WAVS_MSG-REQUEST"
+   "<WAVS_MSG-RESPONSE>"
+   "WAVS_MSG-RESPONSE"
   ))
 

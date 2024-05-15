@@ -85,6 +85,9 @@ preinstall: gtest/preinstall
 # The main recursive "clean" target.
 clean: CMakeFiles/ari_pkg_genpy.dir/clean
 clean: CMakeFiles/ari_pkg_generate_messages_py.dir/clean
+clean: CMakeFiles/ari_pkg_generate_messages_nodejs.dir/clean
+clean: CMakeFiles/ari_pkg_genlisp.dir/clean
+clean: CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/clean
 clean: CMakeFiles/actionlib_generate_messages_cpp.dir/clean
 clean: CMakeFiles/actionlib_msgs_generate_messages_py.dir/clean
 clean: CMakeFiles/actionlib_msgs_generate_messages_eus.dir/clean
@@ -99,8 +102,6 @@ clean: CMakeFiles/sensor_msgs_generate_messages_eus.dir/clean
 clean: CMakeFiles/sensor_msgs_generate_messages_lisp.dir/clean
 clean: CMakeFiles/tf2_msgs_generate_messages_eus.dir/clean
 clean: CMakeFiles/sensor_msgs_generate_messages_py.dir/clean
-clean: CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/clean
-clean: CMakeFiles/ari_pkg_genlisp.dir/clean
 clean: CMakeFiles/tests.dir/clean
 clean: CMakeFiles/roscpp_generate_messages_lisp.dir/clean
 clean: CMakeFiles/clean_test_results.dir/clean
@@ -124,6 +125,7 @@ clean: CMakeFiles/ari_pkg_generate_messages_eus.dir/clean
 clean: CMakeFiles/run_tests.dir/clean
 clean: CMakeFiles/ari_pkg_generate_messages_cpp.dir/clean
 clean: CMakeFiles/std_msgs_generate_messages_lisp.dir/clean
+clean: CMakeFiles/_ari_pkg_generate_messages_check_deps_wavs_msg.dir/clean
 clean: CMakeFiles/tf_generate_messages_lisp.dir/clean
 clean: CMakeFiles/tf_generate_messages_nodejs.dir/clean
 clean: CMakeFiles/rosgraph_msgs_generate_messages_cpp.dir/clean
@@ -138,13 +140,13 @@ clean: CMakeFiles/actionlib_msgs_generate_messages_lisp.dir/clean
 clean: CMakeFiles/tf2_msgs_generate_messages_lisp.dir/clean
 clean: CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/clean
 clean: CMakeFiles/ari_pkg_generate_messages.dir/clean
+clean: CMakeFiles/_ari_pkg_generate_messages_check_deps_msgPOI.dir/clean
 clean: CMakeFiles/geometry_msgs_generate_messages_py.dir/clean
 clean: CMakeFiles/ari_pkg_gencpp.dir/clean
 clean: CMakeFiles/_ari_pkg_generate_messages_check_deps_msgs.dir/clean
 clean: CMakeFiles/ari_pkg_geneus.dir/clean
 clean: CMakeFiles/roscpp_generate_messages_eus.dir/clean
 clean: CMakeFiles/ari_pkg_generate_messages_lisp.dir/clean
-clean: CMakeFiles/ari_pkg_generate_messages_nodejs.dir/clean
 clean: gtest/clean
 
 .PHONY : clean
@@ -218,7 +220,7 @@ CMakeFiles/ari_pkg_genpy.dir/all: CMakeFiles/ari_pkg_generate_messages_py.dir/al
 
 # Build rule for subdir invocation for target.
 CMakeFiles/ari_pkg_genpy.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 4
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/ari_pkg_genpy.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 0
 .PHONY : CMakeFiles/ari_pkg_genpy.dir/rule
@@ -238,15 +240,18 @@ CMakeFiles/ari_pkg_genpy.dir/clean:
 
 # All Build rule for target.
 CMakeFiles/ari_pkg_generate_messages_py.dir/all: CMakeFiles/std_msgs_generate_messages_py.dir/all
+CMakeFiles/ari_pkg_generate_messages_py.dir/all: CMakeFiles/_ari_pkg_generate_messages_check_deps_wavs_msg.dir/all
+CMakeFiles/ari_pkg_generate_messages_py.dir/all: CMakeFiles/_ari_pkg_generate_messages_check_deps_msgPOI.dir/all
+CMakeFiles/ari_pkg_generate_messages_py.dir/all: CMakeFiles/geometry_msgs_generate_messages_py.dir/all
 CMakeFiles/ari_pkg_generate_messages_py.dir/all: CMakeFiles/_ari_pkg_generate_messages_check_deps_msgs.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ari_pkg_generate_messages_py.dir/build.make CMakeFiles/ari_pkg_generate_messages_py.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ari_pkg_generate_messages_py.dir/build.make CMakeFiles/ari_pkg_generate_messages_py.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num=6,7 "Built target ari_pkg_generate_messages_py"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num=14,15,16,17 "Built target ari_pkg_generate_messages_py"
 .PHONY : CMakeFiles/ari_pkg_generate_messages_py.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/ari_pkg_generate_messages_py.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 4
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/ari_pkg_generate_messages_py.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 0
 .PHONY : CMakeFiles/ari_pkg_generate_messages_py.dir/rule
@@ -260,6 +265,91 @@ ari_pkg_generate_messages_py: CMakeFiles/ari_pkg_generate_messages_py.dir/rule
 CMakeFiles/ari_pkg_generate_messages_py.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ari_pkg_generate_messages_py.dir/build.make CMakeFiles/ari_pkg_generate_messages_py.dir/clean
 .PHONY : CMakeFiles/ari_pkg_generate_messages_py.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/ari_pkg_generate_messages_nodejs.dir
+
+# All Build rule for target.
+CMakeFiles/ari_pkg_generate_messages_nodejs.dir/all: CMakeFiles/std_msgs_generate_messages_nodejs.dir/all
+CMakeFiles/ari_pkg_generate_messages_nodejs.dir/all: CMakeFiles/geometry_msgs_generate_messages_nodejs.dir/all
+CMakeFiles/ari_pkg_generate_messages_nodejs.dir/all: CMakeFiles/_ari_pkg_generate_messages_check_deps_wavs_msg.dir/all
+CMakeFiles/ari_pkg_generate_messages_nodejs.dir/all: CMakeFiles/_ari_pkg_generate_messages_check_deps_msgPOI.dir/all
+CMakeFiles/ari_pkg_generate_messages_nodejs.dir/all: CMakeFiles/_ari_pkg_generate_messages_check_deps_msgs.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ari_pkg_generate_messages_nodejs.dir/build.make CMakeFiles/ari_pkg_generate_messages_nodejs.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ari_pkg_generate_messages_nodejs.dir/build.make CMakeFiles/ari_pkg_generate_messages_nodejs.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num=11,12,13 "Built target ari_pkg_generate_messages_nodejs"
+.PHONY : CMakeFiles/ari_pkg_generate_messages_nodejs.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/ari_pkg_generate_messages_nodejs.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 3
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/ari_pkg_generate_messages_nodejs.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 0
+.PHONY : CMakeFiles/ari_pkg_generate_messages_nodejs.dir/rule
+
+# Convenience name for target.
+ari_pkg_generate_messages_nodejs: CMakeFiles/ari_pkg_generate_messages_nodejs.dir/rule
+
+.PHONY : ari_pkg_generate_messages_nodejs
+
+# clean rule for target.
+CMakeFiles/ari_pkg_generate_messages_nodejs.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ari_pkg_generate_messages_nodejs.dir/build.make CMakeFiles/ari_pkg_generate_messages_nodejs.dir/clean
+.PHONY : CMakeFiles/ari_pkg_generate_messages_nodejs.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/ari_pkg_genlisp.dir
+
+# All Build rule for target.
+CMakeFiles/ari_pkg_genlisp.dir/all: CMakeFiles/ari_pkg_generate_messages_lisp.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ari_pkg_genlisp.dir/build.make CMakeFiles/ari_pkg_genlisp.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ari_pkg_genlisp.dir/build.make CMakeFiles/ari_pkg_genlisp.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num= "Built target ari_pkg_genlisp"
+.PHONY : CMakeFiles/ari_pkg_genlisp.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/ari_pkg_genlisp.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 3
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/ari_pkg_genlisp.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 0
+.PHONY : CMakeFiles/ari_pkg_genlisp.dir/rule
+
+# Convenience name for target.
+ari_pkg_genlisp: CMakeFiles/ari_pkg_genlisp.dir/rule
+
+.PHONY : ari_pkg_genlisp
+
+# clean rule for target.
+CMakeFiles/ari_pkg_genlisp.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ari_pkg_genlisp.dir/build.make CMakeFiles/ari_pkg_genlisp.dir/clean
+.PHONY : CMakeFiles/ari_pkg_genlisp.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir
+
+# All Build rule for target.
+CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/build.make CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/build.make CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num= "Built target rosgraph_msgs_generate_messages_nodejs"
+.PHONY : CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 0
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 0
+.PHONY : CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/rule
+
+# Convenience name for target.
+rosgraph_msgs_generate_messages_nodejs: CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/rule
+
+.PHONY : rosgraph_msgs_generate_messages_nodejs
+
+# clean rule for target.
+CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/build.make CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/clean
+.PHONY : CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/actionlib_generate_messages_cpp.dir
@@ -640,60 +730,6 @@ CMakeFiles/sensor_msgs_generate_messages_py.dir/clean:
 .PHONY : CMakeFiles/sensor_msgs_generate_messages_py.dir/clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir
-
-# All Build rule for target.
-CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/build.make CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/build.make CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num= "Built target rosgraph_msgs_generate_messages_nodejs"
-.PHONY : CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/all
-
-# Build rule for subdir invocation for target.
-CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 0
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 0
-.PHONY : CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/rule
-
-# Convenience name for target.
-rosgraph_msgs_generate_messages_nodejs: CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/rule
-
-.PHONY : rosgraph_msgs_generate_messages_nodejs
-
-# clean rule for target.
-CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/build.make CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/clean
-.PHONY : CMakeFiles/rosgraph_msgs_generate_messages_nodejs.dir/clean
-
-#=============================================================================
-# Target rules for target CMakeFiles/ari_pkg_genlisp.dir
-
-# All Build rule for target.
-CMakeFiles/ari_pkg_genlisp.dir/all: CMakeFiles/ari_pkg_generate_messages_lisp.dir/all
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ari_pkg_genlisp.dir/build.make CMakeFiles/ari_pkg_genlisp.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ari_pkg_genlisp.dir/build.make CMakeFiles/ari_pkg_genlisp.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num= "Built target ari_pkg_genlisp"
-.PHONY : CMakeFiles/ari_pkg_genlisp.dir/all
-
-# Build rule for subdir invocation for target.
-CMakeFiles/ari_pkg_genlisp.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 1
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/ari_pkg_genlisp.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 0
-.PHONY : CMakeFiles/ari_pkg_genlisp.dir/rule
-
-# Convenience name for target.
-ari_pkg_genlisp: CMakeFiles/ari_pkg_genlisp.dir/rule
-
-.PHONY : ari_pkg_genlisp
-
-# clean rule for target.
-CMakeFiles/ari_pkg_genlisp.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ari_pkg_genlisp.dir/build.make CMakeFiles/ari_pkg_genlisp.dir/clean
-.PHONY : CMakeFiles/ari_pkg_genlisp.dir/clean
-
-#=============================================================================
 # Target rules for target CMakeFiles/tests.dir
 
 # All Build rule for target.
@@ -948,7 +984,7 @@ CMakeFiles/ari_pkg_gennodejs.dir/all: CMakeFiles/ari_pkg_generate_messages_nodej
 
 # Build rule for subdir invocation for target.
 CMakeFiles/ari_pkg_gennodejs.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 1
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/ari_pkg_gennodejs.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 0
 .PHONY : CMakeFiles/ari_pkg_gennodejs.dir/rule
@@ -1210,16 +1246,19 @@ CMakeFiles/geometry_msgs_generate_messages_eus.dir/clean:
 # Target rules for target CMakeFiles/ari_pkg_generate_messages_eus.dir
 
 # All Build rule for target.
+CMakeFiles/ari_pkg_generate_messages_eus.dir/all: CMakeFiles/geometry_msgs_generate_messages_eus.dir/all
+CMakeFiles/ari_pkg_generate_messages_eus.dir/all: CMakeFiles/_ari_pkg_generate_messages_check_deps_wavs_msg.dir/all
 CMakeFiles/ari_pkg_generate_messages_eus.dir/all: CMakeFiles/std_msgs_generate_messages_eus.dir/all
+CMakeFiles/ari_pkg_generate_messages_eus.dir/all: CMakeFiles/_ari_pkg_generate_messages_check_deps_msgPOI.dir/all
 CMakeFiles/ari_pkg_generate_messages_eus.dir/all: CMakeFiles/_ari_pkg_generate_messages_check_deps_msgs.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ari_pkg_generate_messages_eus.dir/build.make CMakeFiles/ari_pkg_generate_messages_eus.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ari_pkg_generate_messages_eus.dir/build.make CMakeFiles/ari_pkg_generate_messages_eus.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num=2,3 "Built target ari_pkg_generate_messages_eus"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num=4,5,6,7 "Built target ari_pkg_generate_messages_eus"
 .PHONY : CMakeFiles/ari_pkg_generate_messages_eus.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/ari_pkg_generate_messages_eus.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 4
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/ari_pkg_generate_messages_eus.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 0
 .PHONY : CMakeFiles/ari_pkg_generate_messages_eus.dir/rule
@@ -1265,16 +1304,19 @@ CMakeFiles/run_tests.dir/clean:
 # Target rules for target CMakeFiles/ari_pkg_generate_messages_cpp.dir
 
 # All Build rule for target.
+CMakeFiles/ari_pkg_generate_messages_cpp.dir/all: CMakeFiles/geometry_msgs_generate_messages_cpp.dir/all
 CMakeFiles/ari_pkg_generate_messages_cpp.dir/all: CMakeFiles/std_msgs_generate_messages_cpp.dir/all
+CMakeFiles/ari_pkg_generate_messages_cpp.dir/all: CMakeFiles/_ari_pkg_generate_messages_check_deps_wavs_msg.dir/all
+CMakeFiles/ari_pkg_generate_messages_cpp.dir/all: CMakeFiles/_ari_pkg_generate_messages_check_deps_msgPOI.dir/all
 CMakeFiles/ari_pkg_generate_messages_cpp.dir/all: CMakeFiles/_ari_pkg_generate_messages_check_deps_msgs.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ari_pkg_generate_messages_cpp.dir/build.make CMakeFiles/ari_pkg_generate_messages_cpp.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ari_pkg_generate_messages_cpp.dir/build.make CMakeFiles/ari_pkg_generate_messages_cpp.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num=1 "Built target ari_pkg_generate_messages_cpp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num=1,2,3 "Built target ari_pkg_generate_messages_cpp"
 .PHONY : CMakeFiles/ari_pkg_generate_messages_cpp.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/ari_pkg_generate_messages_cpp.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 1
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/ari_pkg_generate_messages_cpp.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 0
 .PHONY : CMakeFiles/ari_pkg_generate_messages_cpp.dir/rule
@@ -1315,6 +1357,33 @@ std_msgs_generate_messages_lisp: CMakeFiles/std_msgs_generate_messages_lisp.dir/
 CMakeFiles/std_msgs_generate_messages_lisp.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/std_msgs_generate_messages_lisp.dir/build.make CMakeFiles/std_msgs_generate_messages_lisp.dir/clean
 .PHONY : CMakeFiles/std_msgs_generate_messages_lisp.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/_ari_pkg_generate_messages_check_deps_wavs_msg.dir
+
+# All Build rule for target.
+CMakeFiles/_ari_pkg_generate_messages_check_deps_wavs_msg.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/_ari_pkg_generate_messages_check_deps_wavs_msg.dir/build.make CMakeFiles/_ari_pkg_generate_messages_check_deps_wavs_msg.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/_ari_pkg_generate_messages_check_deps_wavs_msg.dir/build.make CMakeFiles/_ari_pkg_generate_messages_check_deps_wavs_msg.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num= "Built target _ari_pkg_generate_messages_check_deps_wavs_msg"
+.PHONY : CMakeFiles/_ari_pkg_generate_messages_check_deps_wavs_msg.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/_ari_pkg_generate_messages_check_deps_wavs_msg.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 0
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/_ari_pkg_generate_messages_check_deps_wavs_msg.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 0
+.PHONY : CMakeFiles/_ari_pkg_generate_messages_check_deps_wavs_msg.dir/rule
+
+# Convenience name for target.
+_ari_pkg_generate_messages_check_deps_wavs_msg: CMakeFiles/_ari_pkg_generate_messages_check_deps_wavs_msg.dir/rule
+
+.PHONY : _ari_pkg_generate_messages_check_deps_wavs_msg
+
+# clean rule for target.
+CMakeFiles/_ari_pkg_generate_messages_check_deps_wavs_msg.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/_ari_pkg_generate_messages_check_deps_wavs_msg.dir/build.make CMakeFiles/_ari_pkg_generate_messages_check_deps_wavs_msg.dir/clean
+.PHONY : CMakeFiles/_ari_pkg_generate_messages_check_deps_wavs_msg.dir/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/tf_generate_messages_lisp.dir
@@ -1672,10 +1741,10 @@ CMakeFiles/tf2_msgs_generate_messages_nodejs.dir/clean:
 
 # All Build rule for target.
 CMakeFiles/ari_pkg_generate_messages.dir/all: CMakeFiles/ari_pkg_generate_messages_py.dir/all
+CMakeFiles/ari_pkg_generate_messages.dir/all: CMakeFiles/ari_pkg_generate_messages_nodejs.dir/all
 CMakeFiles/ari_pkg_generate_messages.dir/all: CMakeFiles/ari_pkg_generate_messages_eus.dir/all
 CMakeFiles/ari_pkg_generate_messages.dir/all: CMakeFiles/ari_pkg_generate_messages_cpp.dir/all
 CMakeFiles/ari_pkg_generate_messages.dir/all: CMakeFiles/ari_pkg_generate_messages_lisp.dir/all
-CMakeFiles/ari_pkg_generate_messages.dir/all: CMakeFiles/ari_pkg_generate_messages_nodejs.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ari_pkg_generate_messages.dir/build.make CMakeFiles/ari_pkg_generate_messages.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ari_pkg_generate_messages.dir/build.make CMakeFiles/ari_pkg_generate_messages.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num= "Built target ari_pkg_generate_messages"
@@ -1683,7 +1752,7 @@ CMakeFiles/ari_pkg_generate_messages.dir/all: CMakeFiles/ari_pkg_generate_messag
 
 # Build rule for subdir invocation for target.
 CMakeFiles/ari_pkg_generate_messages.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 7
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 17
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/ari_pkg_generate_messages.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 0
 .PHONY : CMakeFiles/ari_pkg_generate_messages.dir/rule
@@ -1697,6 +1766,33 @@ ari_pkg_generate_messages: CMakeFiles/ari_pkg_generate_messages.dir/rule
 CMakeFiles/ari_pkg_generate_messages.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ari_pkg_generate_messages.dir/build.make CMakeFiles/ari_pkg_generate_messages.dir/clean
 .PHONY : CMakeFiles/ari_pkg_generate_messages.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/_ari_pkg_generate_messages_check_deps_msgPOI.dir
+
+# All Build rule for target.
+CMakeFiles/_ari_pkg_generate_messages_check_deps_msgPOI.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/_ari_pkg_generate_messages_check_deps_msgPOI.dir/build.make CMakeFiles/_ari_pkg_generate_messages_check_deps_msgPOI.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/_ari_pkg_generate_messages_check_deps_msgPOI.dir/build.make CMakeFiles/_ari_pkg_generate_messages_check_deps_msgPOI.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num= "Built target _ari_pkg_generate_messages_check_deps_msgPOI"
+.PHONY : CMakeFiles/_ari_pkg_generate_messages_check_deps_msgPOI.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/_ari_pkg_generate_messages_check_deps_msgPOI.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 0
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/_ari_pkg_generate_messages_check_deps_msgPOI.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 0
+.PHONY : CMakeFiles/_ari_pkg_generate_messages_check_deps_msgPOI.dir/rule
+
+# Convenience name for target.
+_ari_pkg_generate_messages_check_deps_msgPOI: CMakeFiles/_ari_pkg_generate_messages_check_deps_msgPOI.dir/rule
+
+.PHONY : _ari_pkg_generate_messages_check_deps_msgPOI
+
+# clean rule for target.
+CMakeFiles/_ari_pkg_generate_messages_check_deps_msgPOI.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/_ari_pkg_generate_messages_check_deps_msgPOI.dir/build.make CMakeFiles/_ari_pkg_generate_messages_check_deps_msgPOI.dir/clean
+.PHONY : CMakeFiles/_ari_pkg_generate_messages_check_deps_msgPOI.dir/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/geometry_msgs_generate_messages_py.dir
@@ -1737,7 +1833,7 @@ CMakeFiles/ari_pkg_gencpp.dir/all: CMakeFiles/ari_pkg_generate_messages_cpp.dir/
 
 # Build rule for subdir invocation for target.
 CMakeFiles/ari_pkg_gencpp.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 1
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/ari_pkg_gencpp.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 0
 .PHONY : CMakeFiles/ari_pkg_gencpp.dir/rule
@@ -1791,7 +1887,7 @@ CMakeFiles/ari_pkg_geneus.dir/all: CMakeFiles/ari_pkg_generate_messages_eus.dir/
 
 # Build rule for subdir invocation for target.
 CMakeFiles/ari_pkg_geneus.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 4
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/ari_pkg_geneus.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 0
 .PHONY : CMakeFiles/ari_pkg_geneus.dir/rule
@@ -1837,16 +1933,19 @@ CMakeFiles/roscpp_generate_messages_eus.dir/clean:
 # Target rules for target CMakeFiles/ari_pkg_generate_messages_lisp.dir
 
 # All Build rule for target.
+CMakeFiles/ari_pkg_generate_messages_lisp.dir/all: CMakeFiles/geometry_msgs_generate_messages_lisp.dir/all
 CMakeFiles/ari_pkg_generate_messages_lisp.dir/all: CMakeFiles/std_msgs_generate_messages_lisp.dir/all
+CMakeFiles/ari_pkg_generate_messages_lisp.dir/all: CMakeFiles/_ari_pkg_generate_messages_check_deps_wavs_msg.dir/all
+CMakeFiles/ari_pkg_generate_messages_lisp.dir/all: CMakeFiles/_ari_pkg_generate_messages_check_deps_msgPOI.dir/all
 CMakeFiles/ari_pkg_generate_messages_lisp.dir/all: CMakeFiles/_ari_pkg_generate_messages_check_deps_msgs.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ari_pkg_generate_messages_lisp.dir/build.make CMakeFiles/ari_pkg_generate_messages_lisp.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ari_pkg_generate_messages_lisp.dir/build.make CMakeFiles/ari_pkg_generate_messages_lisp.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num=4 "Built target ari_pkg_generate_messages_lisp"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num=8,9,10 "Built target ari_pkg_generate_messages_lisp"
 .PHONY : CMakeFiles/ari_pkg_generate_messages_lisp.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/ari_pkg_generate_messages_lisp.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 1
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/ari_pkg_generate_messages_lisp.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 0
 .PHONY : CMakeFiles/ari_pkg_generate_messages_lisp.dir/rule
@@ -1862,41 +1961,13 @@ CMakeFiles/ari_pkg_generate_messages_lisp.dir/clean:
 .PHONY : CMakeFiles/ari_pkg_generate_messages_lisp.dir/clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/ari_pkg_generate_messages_nodejs.dir
-
-# All Build rule for target.
-CMakeFiles/ari_pkg_generate_messages_nodejs.dir/all: CMakeFiles/std_msgs_generate_messages_nodejs.dir/all
-CMakeFiles/ari_pkg_generate_messages_nodejs.dir/all: CMakeFiles/_ari_pkg_generate_messages_check_deps_msgs.dir/all
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ari_pkg_generate_messages_nodejs.dir/build.make CMakeFiles/ari_pkg_generate_messages_nodejs.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ari_pkg_generate_messages_nodejs.dir/build.make CMakeFiles/ari_pkg_generate_messages_nodejs.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num=5 "Built target ari_pkg_generate_messages_nodejs"
-.PHONY : CMakeFiles/ari_pkg_generate_messages_nodejs.dir/all
-
-# Build rule for subdir invocation for target.
-CMakeFiles/ari_pkg_generate_messages_nodejs.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 1
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/ari_pkg_generate_messages_nodejs.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles 0
-.PHONY : CMakeFiles/ari_pkg_generate_messages_nodejs.dir/rule
-
-# Convenience name for target.
-ari_pkg_generate_messages_nodejs: CMakeFiles/ari_pkg_generate_messages_nodejs.dir/rule
-
-.PHONY : ari_pkg_generate_messages_nodejs
-
-# clean rule for target.
-CMakeFiles/ari_pkg_generate_messages_nodejs.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ari_pkg_generate_messages_nodejs.dir/build.make CMakeFiles/ari_pkg_generate_messages_nodejs.dir/clean
-.PHONY : CMakeFiles/ari_pkg_generate_messages_nodejs.dir/clean
-
-#=============================================================================
 # Target rules for target gtest/googlemock/CMakeFiles/gmock_main.dir
 
 # All Build rule for target.
 gtest/googlemock/CMakeFiles/gmock_main.dir/all:
 	$(MAKE) $(MAKESILENT) -f gtest/googlemock/CMakeFiles/gmock_main.dir/build.make gtest/googlemock/CMakeFiles/gmock_main.dir/depend
 	$(MAKE) $(MAKESILENT) -f gtest/googlemock/CMakeFiles/gmock_main.dir/build.make gtest/googlemock/CMakeFiles/gmock_main.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num=11,12,13,14 "Built target gmock_main"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num=21,22,23,24 "Built target gmock_main"
 .PHONY : gtest/googlemock/CMakeFiles/gmock_main.dir/all
 
 # Build rule for subdir invocation for target.
@@ -1923,7 +1994,7 @@ gtest/googlemock/CMakeFiles/gmock_main.dir/clean:
 gtest/googlemock/CMakeFiles/gmock.dir/all:
 	$(MAKE) $(MAKESILENT) -f gtest/googlemock/CMakeFiles/gmock.dir/build.make gtest/googlemock/CMakeFiles/gmock.dir/depend
 	$(MAKE) $(MAKESILENT) -f gtest/googlemock/CMakeFiles/gmock.dir/build.make gtest/googlemock/CMakeFiles/gmock.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num=8,9,10 "Built target gmock"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num=18,19,20 "Built target gmock"
 .PHONY : gtest/googlemock/CMakeFiles/gmock.dir/all
 
 # Build rule for subdir invocation for target.
@@ -1950,7 +2021,7 @@ gtest/googlemock/CMakeFiles/gmock.dir/clean:
 gtest/googlemock/gtest/CMakeFiles/gtest_main.dir/all: gtest/googlemock/gtest/CMakeFiles/gtest.dir/all
 	$(MAKE) $(MAKESILENT) -f gtest/googlemock/gtest/CMakeFiles/gtest_main.dir/build.make gtest/googlemock/gtest/CMakeFiles/gtest_main.dir/depend
 	$(MAKE) $(MAKESILENT) -f gtest/googlemock/gtest/CMakeFiles/gtest_main.dir/build.make gtest/googlemock/gtest/CMakeFiles/gtest_main.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num=17,18 "Built target gtest_main"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num=27,28 "Built target gtest_main"
 .PHONY : gtest/googlemock/gtest/CMakeFiles/gtest_main.dir/all
 
 # Build rule for subdir invocation for target.
@@ -1977,7 +2048,7 @@ gtest/googlemock/gtest/CMakeFiles/gtest_main.dir/clean:
 gtest/googlemock/gtest/CMakeFiles/gtest.dir/all:
 	$(MAKE) $(MAKESILENT) -f gtest/googlemock/gtest/CMakeFiles/gtest.dir/build.make gtest/googlemock/gtest/CMakeFiles/gtest.dir/depend
 	$(MAKE) $(MAKESILENT) -f gtest/googlemock/gtest/CMakeFiles/gtest.dir/build.make gtest/googlemock/gtest/CMakeFiles/gtest.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num=15,16 "Built target gtest"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/user/exchange/ARI_ws/build/ari_pkg/CMakeFiles --progress-num=25,26 "Built target gtest"
 .PHONY : gtest/googlemock/gtest/CMakeFiles/gtest.dir/all
 
 # Build rule for subdir invocation for target.

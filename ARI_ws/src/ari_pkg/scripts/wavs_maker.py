@@ -9,13 +9,14 @@ from visualization_msgs.msg import InteractiveMarkerUpdate
 # import .srv
 from ari_pkg.srv import msgs, msgsResponse, wavs_msgs, wavs_msgsResponse
 
+wavs_name_dir = "andre" # prima era andre
 
 class create_wavs:
     def __init__(self):
         rospy.init_node("create_wavs")
 
         # Create a service server
-        self.message = rospy.Service("callback", wavs_msgs, self.callback)
+        self.message = rospy.Service("wav_creator", wavs_msgs, self.callback)
 
         rospy.spin()
 
@@ -23,8 +24,8 @@ class create_wavs:
         try:
             tts = gTTS(req.text, lang='it')    
 
-            mp3name =  "../wavs/ARI-wavs" + req.fileName +  ".mp3"
-            wavname =  "../wavs/ARI-wavs" + req.fileName +  ".wav"
+            mp3name = "../wavs/" + wavs_name_dir + "/" + req.name + ".mp3"
+            wavname = "../wavs/" + wavs_name_dir + "/" + req.name + ".wav"
             tts.save(mp3name)
 
             subprocess.call(['ffmpeg', '-i', mp3name, wavname])

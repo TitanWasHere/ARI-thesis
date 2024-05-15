@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
   "/home/user/exchange/ARI_ws/devel/.private/ari_pkg/lib/python2.7/dist-packages/ari_pkg/srv/__init__.py"
+  "/home/user/exchange/ARI_ws/devel/.private/ari_pkg/lib/python2.7/dist-packages/ari_pkg/srv/_msgPOI.py"
   "/home/user/exchange/ARI_ws/devel/.private/ari_pkg/lib/python2.7/dist-packages/ari_pkg/srv/_msgs.py"
+  "/home/user/exchange/ARI_ws/devel/.private/ari_pkg/lib/python2.7/dist-packages/ari_pkg/srv/_wavs_msg.py"
   "CMakeFiles/ari_pkg_generate_messages_py"
 )
 
