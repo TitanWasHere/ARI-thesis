@@ -196,6 +196,14 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/ari_pkg" TYPE PROGRAM FILES "/home/user/exchange/ARI_ws/build/ari_pkg/catkin_generated/installspace/confirm_mov.py")
 endif()
 
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/ari_pkg" TYPE PROGRAM FILES "/home/user/exchange/ARI_ws/build/ari_pkg/catkin_generated/installspace/make_wavs.py")
+endif()
+
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/ari_pkg" TYPE PROGRAM FILES "/home/user/exchange/ARI_ws/build/ari_pkg/catkin_generated/installspace/prova.py")
+endif()
+
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   include("/home/user/exchange/ARI_ws/build/ari_pkg/gtest/cmake_install.cmake")

@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_service_files(
   FILES
   msgs.srv
+  wavs_msg.srv
 )
 
 generate_messages(
@@ -26,7 +27,7 @@ catkin_package(
   CATKIN_DEPENDS message_runtime
 )
 
-catkin_install_python(PROGRAMS scripts/make_wavs.py scripts/speech.py scripts/confirm_mov.py
+catkin_install_python(PROGRAMS scripts/make_wavs.py scripts/speech.py scripts/confirm_mov.py scripts/make_wavs.py scripts/prova.py
 	DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
  

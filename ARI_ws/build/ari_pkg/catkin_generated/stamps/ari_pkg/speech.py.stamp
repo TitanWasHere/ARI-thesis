@@ -8,6 +8,9 @@ from pal_navigation_msgs.msg import GoToPOIActionGoal
 from gtts import gTTS
 import subprocess
 from visualization_msgs.msg import InteractiveMarkerUpdate
+# import .srv
+#from ari_pkg.srv import msgs 
+#kisscami was here, baciniiiii
 
 wavs_name_dir = "muse" # prima era andre
 topics_file_name = "muse_topics.json"

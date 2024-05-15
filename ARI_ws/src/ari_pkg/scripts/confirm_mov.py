@@ -10,6 +10,7 @@ from gtts import gTTS
 import subprocess 
 from pal_navigation_msgs.msg import GoToPOIActionGoal
 from visualization_msgs.msg import InteractiveMarkerUpdate
+from ari_pkg.srv import msgs, msgsResponse
 
 wavs_name_dir = "muse"
 poi_file_name = "muse_poi.json"
@@ -21,6 +22,10 @@ class checkMovement:
         self.goal = rospy.Publisher('/poi_navigation_server/go_to_poi/goal', GoToPOIActionGoal, queue_size=2)
         self.sub_speech = rospy.Subscriber('/POI/move/check', String, self.callback)
         self.pub_status = rospy.Publisher('/POI/move/status', String, queue_size=2)
+
+        # Define the server service
+        s = rospy.Service("/POI/move/check" , msgs, self.callback)
+
         self.firstFound = ""
         self.current_dir = os.path.dirname(os.path.abspath(__file__))
         self.path_wavs = "../wavs/" + wavs_name_dir + "/"

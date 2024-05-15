@@ -1,12 +1,12 @@
 [  0%] Built target std_msgs_generate_messages_nodejs
+[  0%] Built target std_msgs_generate_messages_cpp
 [  0%] Built target std_msgs_generate_messages_py
 [  0%] Built target std_msgs_generate_messages_eus
 [  0%] Built target std_msgs_generate_messages_lisp
-[  0%] Built target std_msgs_generate_messages_cpp
 [  0%] Built target _ari_pkg_generate_messages_check_deps_msgs
 [ 14%] Built target ari_pkg_generate_messages_nodejs
 [ 42%] Built target ari_pkg_generate_messages_eus
 [ 71%] Built target ari_pkg_generate_messages_py
-[ 85%] Built target ari_pkg_generate_messages_lisp
-[100%] Built target ari_pkg_generate_messages_cpp
+[ 85%] Built target ari_pkg_generate_messages_cpp
+[100%] Built target ari_pkg_generate_messages_lisp
 [100%] Built target ari_pkg_generate_messages
