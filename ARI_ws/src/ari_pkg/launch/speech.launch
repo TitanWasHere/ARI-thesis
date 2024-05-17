@@ -7,7 +7,7 @@
 
     <node name="speech_recognizer" type="talk.py" pkg="ari_pkg" output="screen" />
     <node name="check_POI" type="confirm_move.py" pkg="ari_pkg" output="screen" />
-    <node name="download" type="make_wavs.py" pkg="ari_pkg" output="screen" />
+    <node name="download" type="wavs_maker.py" pkg="ari_pkg" output="screen" />
     <node name="move" type="move.py" pkg="ari_pkg" output="screen" />
 
 </launch>

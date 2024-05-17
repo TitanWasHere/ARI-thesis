@@ -29,7 +29,7 @@ catkin_package(
   CATKIN_DEPENDS message_runtime
 )
 
-catkin_install_python(PROGRAMS scripts/make_wavs.py scripts/speech.py scripts/confirm_mov.py scripts/make_wavs.py scripts/prova.py
+catkin_install_python(PROGRAMS scripts/talk.py scripts/speech.py scripts/confirm_mov.py scripts/confirm_move.py scripts/move.py scripts/make_wavs.py scripts/prova.py
 	DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
  
