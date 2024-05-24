@@ -43,7 +43,7 @@ class calibration:
         
         self.sub_torso = rospy.Subscriber('/torso_front_camera/color/image_raw', Image, self.image_callback, queue_size=2)
         self.get_move = rospy.Subscriber('/move_base_simple/goal', PoseStamped, self.move_callback, queue_size=2)
-        self.sub_front = rospy.Subscriber('/head_front_camera/color/image_raw/compressed', CompressedImage, self.image_compressed_callback, queue_size=2)
+        #self.sub_front = rospy.Subscriber('/head_front_camera/color/image_raw/compressed', CompressedImage, self.image_compressed_callback, queue_size=2)
         
         self.sub_transform = rospy.Subscriber("/transform", TFMessage, self.transform_callback)
         self.sub_velocity = rospy.Subscriber("/mobile_base_controller/cmd_vel", Twist, self.velocity_callback)
@@ -86,7 +86,13 @@ class calibration:
         #self.can_restart_moving = True
 
     def move_callback(self, msg):
-        self.last_goto = self.assign_values(msg.pose)
+        print(msg)
+        var = namedtuple("Pose", ["position", "orientation"])
+        position = namedtuple("Position", ["x", "y", "z"])
+        orientation = namedtuple("Orientation", ["x", "y", "z", "w"])
+        pos = position(msg.pose.position.x, msg.pose.position.y, msg.pose.position.z)
+        ori = orientation(msg.pose.orientation.x, msg.pose.orientation.y, msg.pose.orientation.z, msg.pose.orientation.w)
+        self.last_goto = (pos,ori)
 
     
     def velocity_callback(self, msg):
@@ -228,7 +234,19 @@ class calibration:
     
     #Stop the motion by publishing the go to himself
     def stop_motion(self):
-        self.pub_move.publish(self.map_to_baseFootprint)
+        pose = PoseStamped()
+        pose.header = Header()
+        pose.header.stamp = rospy.Time.now()
+        pose.header.frame_id = "map"
+        pose.pose.position.x = self.map_to_baseFootprint.position.x
+        pose.pose.position.y = self.map_to_baseFootprint.position.y
+        pose.pose.position.z = 0
+        pose.pose.orientation.x = self.map_to_baseFootprint.orientation.x
+        pose.pose.orientation.y = self.map_to_baseFootprint.orientation.y
+        pose.pose.orientation.z = self.map_to_baseFootprint.orientation.z
+        pose.pose.orientation.w = self.map_to_baseFootprint.orientation.w
+
+        self.pub_move.publish(pose)
         self.needToStop = False
 
 
@@ -355,7 +373,7 @@ class calibration:
                         print("[INFO]: Ripubblico la posizione")
                         self.pub_myPos.publish(pose)
 
-                        self.pub_velocity.publish(self.last_goto)
+                        #self.pub_velocity.publish(self.last_goto)
                         self.needToStop = False
                         self.last_time_seen_aruco = (int)(time.time())
                         self.last_seen_aruco = ids[i]
