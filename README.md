@@ -43,18 +43,32 @@ The main files of the workspace are:
 
 ### Launch
 Each launch file is used to start a specific part of the robot, or one to start them simultaneously. 
-To start the robot you need to run the following command:
+To start the robot speech node you need to run the following command:
 ```bash
 roslaunch ari_pkg speech.launch
+```
+To start the robot control and calibration node you need to run the following command:
+```bash
+roslaunch ari_pkg detect.launch
 ```
 
 ### Talking
 The talking part of the robot is used to make the robot speak and listen to the user.
-You can ask to the robot also to go to a point of interest and it will go. For the moment you can only say some specific words associated to the point of interest:
- - **ari_16c_dockstation**: "dock", "ricarica", "stazione"
- - **poi_name**: "keyword1", "keyword2", "keyword3"
+You can ask to the robot also to go to a point of interest and it will go. For the moment you can only say some specific words associated to the point of interest, you can find them in the file `scripts/points_of_interest.json`.
 
-To start the talking part of the robot you need to run the following command:
+You can also start single nodes for the speech part of the robot, like the talking part is made only in the speech.py file. You can start it with the following command:
 ```bash
-python scripts/speech.py
+rosrun ari_pkg talk.py
 ```
+
+Or if you want to test the moving part given by vocal commands you can start the following node:
+```bash
+rosrun ari_pkg move.py
+```
+but remember that you need to have another shell open where you send a string with the phrase you want to say to the robot. You can do it with the following command:
+>```bash
+>rosrun ari_pkg move.py
+>```
+>```bash
+>rostopic pub /speech std_msgs/String "data: 'Vai alla docking station'"
+>```

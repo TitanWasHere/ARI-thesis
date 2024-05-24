@@ -38,9 +38,11 @@ class calibration:
         self.pub_front = rospy.Publisher('/head_front_camera/color/aruco', Image, queue_size=2)
         self.pub_myPos = rospy.Publisher('/initialpose', PoseWithCovarianceStamped, queue_size=2)
         self.pub_velocity = rospy.Publisher('/mobile_base_controller/cmd_vel', Twist, queue_size=2)
+        self.pub_move = rospy.Publisher('/move_base_simple/goal', PoseStamped, queue_size=2)
+
         
         self.sub_torso = rospy.Subscriber('/torso_front_camera/color/image_raw', Image, self.image_callback, queue_size=2)
-        
+        self.get_move = rospy.Subscriber('/move_base_simple/goal', PoseStamped, self.move_callback, queue_size=2)
         self.sub_front = rospy.Subscriber('/head_front_camera/color/image_raw/compressed', CompressedImage, self.image_compressed_callback, queue_size=2)
         
         self.sub_transform = rospy.Subscriber("/transform", TFMessage, self.transform_callback)
@@ -77,8 +79,14 @@ class calibration:
         self.timeToPassSinceStopped = 2
         self.last_time_seen_aruco = 0
         self.needToRecalibrate = False
+
+
+        self.last_goto = None
     
         #self.can_restart_moving = True
+
+    def move_callback(self, msg):
+        self.last_goto = self.assign_values(msg.pose)
 
     
     def velocity_callback(self, msg):
@@ -146,8 +154,6 @@ class calibration:
         cv2.imshow('image_torso', frame)
         cv2.waitKey(1)
 
-        
-
         self.manage_frame(frame, tvec, rvec, ids, "torso" )
 
 
@@ -210,16 +216,23 @@ class calibration:
             return frame, tvec, rvec, ids
         return frame, None, None, None
 
-    def velocity_to_zero(self):
-        velocity = Twist()
-        velocity.linear.x = 0
-        velocity.linear.y = 0
-        velocity.linear.z = 0
-        velocity.angular.x = 0
-        velocity.angular.y = 0
-        velocity.angular.z = 0
-        return velocity
+    # def velocity_to_zero(self):
+    #     velocity = Twist()
+    #     velocity.linear.x = 0
+    #     velocity.linear.y = 0
+    #     velocity.linear.z = 0
+    #     velocity.angular.x = 0
+    #     velocity.angular.y = 0
+    #     velocity.angular.z = 0
+    #     return velocity
     
+    #Stop the motion by publishing the go to himself
+    def stop_motion(self):
+        self.pub_move.publish(self.map_to_baseFootprint)
+        self.needToStop = False
+
+
+
     def manage_frame(self, frame, tvec, rvec, ids, type):
         #self.publish_arucos_in_map()
         
@@ -286,8 +299,7 @@ class calibration:
                         if not self.needToStop:
                             if self.last_seen_aruco != ids[i] or (int)(time.time()) - self.last_time_seen_aruco > self.time_to_pass_since_last:
                                 self.last_velocity = self.velocity
-                                stop_velocity = self.velocity_to_zero()
-                                self.pub_velocity.publish(stop_velocity)
+                                self.stop_motion()
                                 print("[STOP]: Stopping for " + str((int)(time.time()) - self.last_time_seen_aruco) + " seconds")
                                 self.last_time_seen_aruco = (int)(time.time())
                                 self.needToStop = True
@@ -343,7 +355,7 @@ class calibration:
                         print("[INFO]: Ripubblico la posizione")
                         self.pub_myPos.publish(pose)
 
-                        self.pub_velocity.publish(self.last_velocity)
+                        self.pub_velocity.publish(self.last_goto)
                         self.needToStop = False
                         self.last_time_seen_aruco = (int)(time.time())
                         self.last_seen_aruco = ids[i]
