@@ -43,7 +43,7 @@ class calibration:
         
         self.sub_torso = rospy.Subscriber('/torso_front_camera/color/image_raw', Image, self.image_callback, queue_size=2)
         self.get_move = rospy.Subscriber('/move_base_simple/goal', PoseStamped, self.move_callback, queue_size=2)
-        #self.sub_front = rospy.Subscriber('/head_front_camera/color/image_raw/compressed', CompressedImage, self.image_compressed_callback, queue_size=2)
+        self.sub_front = rospy.Subscriber('/head_front_camera/color/image_raw/compressed', CompressedImage, self.image_compressed_callback, queue_size=2)
         
         self.sub_transform = rospy.Subscriber("/transform", TFMessage, self.transform_callback)
         self.sub_velocity = rospy.Subscriber("/mobile_base_controller/cmd_vel", Twist, self.velocity_callback)
@@ -313,7 +313,8 @@ class calibration:
                     print(distance)
                     # Solo se la distanza dall'aruco visto e' minore di 1.2 metri procedo, cosi' da avere maggiore accuratezza
                     if distance < 1.5:
-
+                        
+                        # DECOMMENTA QUANDO AVRAI TROVATO SOLUIONE PER MOVIMENTO
                         if not self.needToStop:
                             if self.last_seen_aruco != ids[i] or (int)(time.time()) - self.last_time_seen_aruco > self.time_to_pass_since_last:
                                 self.last_velocity = self.velocity
@@ -371,8 +372,9 @@ class calibration:
                         pose.pose.pose.orientation.z = quat_map_base[3]
                         pose.pose.pose.orientation.w = quat_map_base[0]
                         print("[INFO]: Ripubblico la posizione")
-                        self.pub_myPos.publish(pose)
+                        #self.pub_myPos.publish(pose)
 
+                        # DECOMMENTA QUANDO AVRAI TROVATO SOLUIONE PER MOVIMENTO
                         #self.pub_velocity.publish(self.last_goto)
                         self.needToStop = False
                         self.last_time_seen_aruco = (int)(time.time())
