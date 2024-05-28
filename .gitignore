@@ -2,3 +2,4 @@
 MakeFile
 .gitignore
 .env
+*.css
