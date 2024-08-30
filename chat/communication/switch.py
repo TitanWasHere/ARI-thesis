@@ -8,14 +8,58 @@ class Switch:
         # Initialize ROS subscribers and publishers
         self.sub_message = rospy.Subscriber("/process_gpt", String, self.gpt_callback)
         self.sub_clear = rospy.Subscriber("/clear_chat", String, self.clear_chat)
+        self.sub_mic = rospy.Subscriber("/microphone", String, self.listen_mic)
         
+        self.pub_recognizing = rospy.Publisher("/mic_recognizing", String, queue_size=10)
+        self.pub_mic = rospy.Publisher("/mic_response", String, queue_size=10)    
         # Start the subprocess
         self.start_process()
+
+    def listen_mic(self, req):
+        rospy.loginfo("Listening...")
+        
+        if self.process_mic.poll() is not None:
+            rospy.logwarn("Subprocess is not running. Restarting...")
+            self.start_process()
+
+        try:
+            self.process_mic.stdin.write("start" + '\n')
+            self.process_mic.stdin.flush()
+        except IOError as e:
+            rospy.logerr("IOError while writing to subprocess stdin: %s", str(e))
+            self.restart_process()
+
+        try:
+            response = self.process_mic.stdout.readline()
+            if response:
+                rospy.loginfo("Received response: %s", response.strip())
+                self.pub_recognizing.publish(response.strip())  # Correct the publish call
+            else:
+                rospy.logwarn("No response received.")
+        except IOError as e:
+            rospy.logerr("IOError while reading from subprocess stdout: %s", str(e))
+            self.restart_process()
+
+        try:
+            response = self.process_mic.stdout.readline()
+            if response:
+                rospy.loginfo("Received response: %s", response.strip())
+                self.pub_mic.publish(response.strip())  # Correct the publish call
+            else:
+                rospy.logwarn("No response received.")
+        except IOError as e:
+            rospy.logerr("IOError while reading from subprocess stdout: %s", str(e))
+            self.restart_process()
+
+
+        
 
     def clear_chat(self, req):
         myStr = String()
         myStr.data = "clear"
         self.gpt_callback(myStr)
+
+
 
     def start_process(self):
         # Start the subprocess
@@ -26,13 +70,27 @@ class Switch:
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
-            bufsize=1000
+            bufsize=1
+        )
+
+        self.process_mic = subprocess.Popen(
+            ['python3.10', 'mic.py'],  # Use 'python' for Python 2.7
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
+            bufsize=1
         )
 
         # Read the stderr to check for errors
         err_output = self.process.stderr.read()
         if err_output:
             rospy.logerr("Subprocess error output: %s", err_output)
+
+        err_output_mic = self.process_mic.stderr.read()
+        if err_output_mic:
+            rospy.logerr("Subprocess error output: %s", err_output_mic)
+
 
     def gpt_callback(self, msg):
         message = msg.data
