@@ -1,5 +1,5 @@
 *.make
 MakeFile
 .gitignore
-.env
+*.env
 *.css
