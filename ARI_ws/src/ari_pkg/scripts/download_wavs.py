@@ -3,7 +3,7 @@ import os
 from collections import deque
 import json
 
-respjson = "../json/responses.json" # Name of the json file
+respjson = "../json/res.json" # Name of the json file
 
 from gtts import gTTS
 import subprocess 
