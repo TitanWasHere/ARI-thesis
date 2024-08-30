@@ -2,6 +2,7 @@
 
 import speech_recognition as sr
 from std_msgs.msg import String
+import sys
 
 class MicrophoneListener:
     def __init__(self):

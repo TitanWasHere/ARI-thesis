@@ -44,22 +44,20 @@ class Chatbot:
             messaggio = sys.stdin.readline()
             if not messaggio:
                 break
-            
-            resp = ""
+
             # Remove newline character
             messaggio = messaggio.strip()
-    
+            resp = ""
             if messaggio == "clear":
+                #print("Chat history cleared.", file=sys.stderr)  # Debug logging
                 self.chat_history.clear()
                 self.chat_history = []
                 resp = "Chat history cleared."
             else:
-                resp = self.process_message(messaggio + "\n")
-                
+                self.process_message(messaggio + "\n")
+
             # Print and flush the response
             print(resp)  # Debug logging
-
-
             sys.stdout.flush()
 
     def load_topics(self):
