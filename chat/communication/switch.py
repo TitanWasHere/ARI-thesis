@@ -54,7 +54,8 @@ class Switch:
             self.restart_process()
 
 
-    def play_wav(self, message):
+    def play_wav(self, msg):
+        message = msg.data
         rospy.loginfo("Playing wav...")
 
         if self.process_wav.poll() is not None:
