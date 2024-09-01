@@ -54,7 +54,7 @@ class Chatbot:
                 self.chat_history = []
                 resp = "Chat history cleared."
             else:
-                self.process_message(messaggio + "\n")
+                resp = self.process_message(messaggio + "\n")
 
             # Print and flush the response
             print(resp)  # Debug logging
