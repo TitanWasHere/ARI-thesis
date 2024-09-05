@@ -95,7 +95,8 @@ class Switch:
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
-            bufsize=1
+            bufsize=1,
+            shell=True
         )
 
         self.process_mic = subprocess.Popen(
@@ -104,7 +105,8 @@ class Switch:
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
-            bufsize=1
+            bufsize=1,
+            shell=True
         )
 
         self.process_wav = subprocess.Popen(
@@ -113,7 +115,8 @@ class Switch:
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
-            bufsize=1
+            bufsize=1,
+            shell=True
         )
 
         # Read the stderr to check for errors
