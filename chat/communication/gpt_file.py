@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3.10
 
 import os
 import dotenv
@@ -14,6 +14,8 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain.chains import create_retrieval_chain, create_history_aware_retriever
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.messages import HumanMessage, AIMessage
+import time
+import zmq
 
 class Chatbot:
     def __init__(self):
@@ -33,32 +35,31 @@ class Chatbot:
         self.openai_model = "gpt-4o"
         self.messages = []
 
+        self.input_file = "gpt_input.txt"
+        self.output_file = "gpt_output.txt"
+
+        context = zmq.Context()
+
+        # Socket to receive messages
+        self.socket_recv = context.socket(zmq.PAIR)
+        self.socket_recv.bind("tcp://0.0.0.0:5558")
+
+        # Socket to send messages
+        self.socket_send = context.socket(zmq.PAIR)
+        self.socket_send.connect("tcp://0.0.0.0:5557")
+
         self.load_topics()
         self.load_points_of_interest()
         docs = self.get_documents()
         self.vectorStore = self.create_db(docs)
         self.chain = self.create_chain(self.vectorStore)
 
-        while True:
-            # Read a message from stdin
-            messaggio = sys.stdin.readline()
-            if not messaggio:
-                break
+        # if os.path.isfile(self.output_file):
+        #     os.remove(self.output_file)
 
-            # Remove newline character
-            messaggio = messaggio.strip()
-            resp = ""
-            if messaggio == "clear":
-                #print("Chat history cleared.", file=sys.stderr)  # Debug logging
-                self.chat_history.clear()
-                self.chat_history = []
-                resp = "Chat history cleared."
-            else:
-                resp = self.process_message(messaggio + "\n")
 
-            # Print and flush the response
-            print(resp)  # Debug logging
-            sys.stdout.flush()
+        # Start the file-based server
+        self.start_file_server()
 
     def load_topics(self):
         with open(os.path.join(self.DIRECTORY_PATH, self.TOPICS_FILE)) as f:
@@ -101,7 +102,7 @@ class Chatbot:
 
         splitDocs = splitter.split_documents(docs)
         return splitDocs
-        
+
     def create_db(self, docs):
         embedding = HuggingFaceEmbeddings(
             model_name="sentence-transformers/all-mpnet-base-v2"
@@ -124,9 +125,9 @@ class Chatbot:
         Inoltre, sono associati anche delle risposte generiche con nome associato "text_if_error", queste risposte sono le risposte associate al topic.
         I valori {poi} sono i punti di interesse in cui vogliamo andare, 
         i valori sono il nome del punto di interesse con associate le parole chiave di tale, il suo nome del file .wav associato e come viene chiamato. 
-        Quando l'utente ti fa una domanda, capisci a che topic si fa riferimento, se non si riferisce particolarmente a nessuna categoria, allora dai comunque una risposta, altrimenti inizia la frase con '!topic_'+nome della categoria e rispondi con la risposta associata al topic o in un modo simile ogni volta che si ri presenta il topic. 
+        Quando l'utente ti fa una domanda, capisci a che topic si fa riferimento, se non si riferisce particolarmente a nessuna categoria, allora dai comunque una risposta, altrimenti inizia la frase con '!topic_'+nome della categoria e rispondi con la risposta associata al topic o in un modo simile ogni volta che si ripresenta il topic. 
         Se la categoria è "goto" allora dimmi il punto di interesse più simile associato altrimenti non dire nulla, per farlo dimmi il nome del punto di interesse dalla lista,
-        inoltre sia se è chiaro ed è la prima volta che viene chiesto, sia che non è esattamente chiaro a quale punto di interesse vuole andare, chiedi una conferma fra quelli disponibili usando il loro nome parlato, finchè non è esattamente chiaro a quale punto di interesse ci si riferisce chiedi sempre una maggiore conferma più dettagliata
+        inoltre sia se è chiaro ed è la prima volta che viene chiesto, sia che non è esattamente chiaro a quale punto di interesse vuole andare, chiedi una conferma fra quelli disponibili usando il loro nome parlato, finché non è esattamente chiaro a quale punto di interesse ci si riferisce chiedi sempre una maggiore conferma più dettagliata
         Se il punto di interesse viene confermato allora rispondi con "vado a 'nome punto di interesse', non rispondere mai con "vado a ..." in altre situazioni.
         Rispondi senza andare a capo.
 
@@ -164,7 +165,7 @@ class Chatbot:
         )
 
         return retriever_chain
-    
+
     def process_message(self, message):
         response = self.chain.invoke({
             "input": message,
@@ -175,7 +176,51 @@ class Chatbot:
         resp = response['answer']
         self.chat_history.append(HumanMessage(content=message))
         self.chat_history.append(AIMessage(content=resp))
+
         return resp
+
+    def start_file_server(self):
+        while True:
+            message = self.socket_recv.recv_string()
+            if message:
+                response = None
+                if message == "clear":
+                    self.chat_history.clear()
+                    self.chat_history = []
+                    response = "Chat history cleared."
+                else:
+                    response = self.process_message(message)
+
+                self.socket_send.send_string(response)
+
+            
+        # while True:
+        #     # Poll the input file for new messages
+        #     if os.path.isfile(self.input_file):
+        #         message = None
+        #         with open(self.input_file, 'r') as file:
+        #             message = file.read().strip()
+        #             file.flush()
+                
+        #         if message:
+        #             # Process the message using the chatbot
+        #             if message == "clear":
+        #                 self.chat_history.clear()
+        #                 self.chat_history = []
+        #                 response = "Chat history cleared."
+        #             else:
+        #                 response = self.process_message(message)
+
+        #             # Write the response to the output file
+        #             with open(self.output_file, 'w') as file:
+        #                 file.write(response)
+        #                 file.flush()
+                    
+        #             # Remove the input file after processing
+        #             os.remove(self.input_file)
+                
+        #         # Wait before polling again
+        #         time.sleep(1)
 
 def main():
     Chatbot()
