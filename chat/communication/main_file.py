@@ -50,7 +50,7 @@ class Switch:
         msg = req.data
         self.socket_send.send_string(msg)
         response = self.socket_recv.recv()
-        response = self.read_from_file(self.gpt_output_file)
+        #response = self.read_from_file(self.gpt_output_file)
         rospy.loginfo("GPT Response: %s", response)
         
         #return response
