@@ -172,7 +172,7 @@ class Switch:
                 response = self.listen_mic()
                 print("[INFO]: Mic Response: " + response)
             elif cmd == "clear":
-                self.write_to_file(self.gpt_input_file, "clear")
+                #self.write_to_file(self.gpt_input_file, "clear")
                 print("Clearing chat...")
             elif cmd == "exit":
                 print("Exiting...")
