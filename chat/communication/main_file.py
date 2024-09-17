@@ -9,6 +9,8 @@ from std_msgs.msg import String
 import zmq
 import subprocess
 import signal
+from gtts import gTTS
+
 
 class Switch:
     def __init__(self):
@@ -55,9 +57,36 @@ class Switch:
         
         #return response
         self.pub_resp.publish(response)
+
+        if response[0] == "!":
+            resp = response.split()
+            response = " ".join(resp[1:])
+
+        self.play_wav(response)
+        
     
     def play_wav(self, msg):
-        self.socket_send_wav.send_string(msg)
+        #self.socket_send_wav.send_string(msg)
+        print(f"Playing message: {msg}")
+        tts = gTTS(msg, lang='it')
+        print("Saving audio file...")
+        mp3name = "temp.mp3"
+        print(f"Saving mp3 file: {mp3name}")
+        tts.save(mp3name)
+        print("Converting mp3 to wav...")
+
+        res = subprocess.run(['ffmpeg', '-i', mp3name, '-f', 'alsa', 'default'], check=True)
+
+        print(f"Conversion result: {res}")
+
+
+        if res != 0:        
+            os.system(f"rm {mp3name}")
+            #os.system(f"rm {wavname}")
+            return "error"
+        
+        print("Playing audio file...")
+        os.system(f"aplay {mp3name}")
 
 
     def clear_chat(self, req):
@@ -94,8 +123,8 @@ class Switch:
             port_send_gpt = "5558"
             port_recv_gpt = "5557"
 
-            port_send_wav = "5556"
-            port_recv_wav = "5555"
+            # port_send_wav = "5556"
+            # port_recv_wav = "5555"
 
 
 
@@ -120,10 +149,10 @@ class Switch:
             time.sleep(1)
             print("[INFO]: Started GPT server (gpt.py)")
             
-            subprocess.Popen(['python3.10', 'play_wav_file.py'])
-            print("[INFO]: Waiting for Play WAV server to start...")
-            time.sleep(1)
-            print("[INFO]: Started Play WAV server (play_wav.py)")
+            # subprocess.Popen(['python3.10', 'play_wav_file.py'])
+            # print("[INFO]: Waiting for Play WAV server to start...")
+            # time.sleep(1)
+            # print("[INFO]: Started Play WAV server (play_wav.py)")
 
             
 
@@ -136,13 +165,13 @@ class Switch:
             self.socket_recv = context.socket(zmq.PAIR)
             self.socket_recv.bind("tcp://0.0.0.0:"+port_recv_gpt)
 
-            # Socket to send messages
-            self.socket_send_wav = context.socket(zmq.PAIR)
-            self.socket_send_wav.connect("tcp://0.0.0.0:"+port_send_wav)
+            # # Socket to send messages
+            # self.socket_send_wav = context.socket(zmq.PAIR)
+            # self.socket_send_wav.connect("tcp://0.0.0.0:"+port_send_wav)
 
-            # Socket to receive messages
-            self.socket_recv_wav = context.socket(zmq.PAIR)
-            self.socket_recv_wav.bind("tcp://0.0.0.0:"+port_recv_wav)
+            # # Socket to receive messages
+            # self.socket_recv_wav = context.socket(zmq.PAIR)
+            # self.socket_recv_wav.bind("tcp://0.0.0.0:"+port_recv_wav)
                                       
                                          
 
