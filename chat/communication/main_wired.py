@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import os
 import sys
@@ -10,6 +11,10 @@ import zmq
 import subprocess
 import signal
 from gtts import gTTS
+
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 
 
 class Switch:
@@ -113,6 +118,7 @@ class Switch:
     def play_wav(self, msg):
         #self.socket_send_wav.send_string(msg)
         print("Playing message: {msg}".format(msg=msg))
+        msg = msg.encode('utf-8')
         tts = gTTS(msg, lang='it')
         print("Saving audio file...")
         mp3name = "temp.mp3"
@@ -120,12 +126,13 @@ class Switch:
         print("Saving mp3 file: {mp3name}".format(mp3name=mp3name))
         tts.save(mp3name)
         print("Converting mp3 to wav...")
-
-        res = subprocess.call(['ffmpeg', '-i', mp3name, wavname], shell=True)
+        print("CD = {d}".format(d=os.getcwd()))
+        # res = subprocess.call(['(', 'cd', os.getcwd(), '&&', 'ffmpeg', '-y', '-i', mp3name, wavname, ')'], shell=True)
+        res = os.system("ffmpeg -y -i {f} {w}".format(f=mp3name,w=wavname));
 
         print("Conversion result: {res}".format(res=res))
 
-        if res and res != 0:        
+        if res != 0:        
             os.system("rm {mp3name}".format(mp3name=mp3name))
             #os.system(f"rm {wavname}")
             return "error"
